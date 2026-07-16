@@ -5,8 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="الصلاة">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f5132">
 <title>متابعة الصلاة</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
   :root{
     --green:#16a34a; --green-d:#166534;
@@ -299,6 +304,7 @@
       <div class="ntime"><b id="nextTime">—</b><span>الوقت</span></div>
     </div>
 
+    <button class="notif-btn" id="installBtn" style="display:none">📲 ثبّت التطبيق على جهازك</button>
     <button class="notif-btn" id="notifBtn">🔔 فعّل تذكير الصلاة</button>
     <div class="notif-note" id="notifNote">التذكير يشتغل والتطبيق مفتوح. أضف التطبيق للشاشة الرئيسية ليعمل بشكل أفضل.</div>
 
@@ -1023,6 +1029,53 @@ reminderCheck();
 setInterval(()=>{ reminderCheck(); if(document.getElementById('page-today').classList.contains('active')){ renderNextPrayer(); } }, 30000);
 // حدّث عند العودة للتطبيق
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ viewDate=new Date(); renderPrayers(); renderHero(); reminderCheck(); } });
+
+/* ================= PWA: service worker + install ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      // إذا وصل تحديث جديد، فعّله وأبلغ المستخدم
+      reg.addEventListener('updatefound',()=>{
+        const sw=reg.installing;
+        if(!sw) return;
+        sw.addEventListener('statechange',()=>{
+          if(sw.state==='installed' && navigator.serviceWorker.controller){
+            sw.postMessage('skipWaiting');
+            toast('✨ يوجد تحديث جديد — أعد فتح التطبيق');
+          }
+        });
+      });
+    }).catch(()=>{});
+  });
+  let refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(refreshing) return; refreshing=true; window.location.reload();
+  });
+}
+
+// زر التثبيت (Android/Chrome): يظهر فقط إذا كان التثبيت متاحاً
+let deferredPrompt=null;
+const installBtn=document.getElementById('installBtn');
+const notifNoteEl=document.getElementById('notifNote');
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  if(!isStandalone) installBtn.style.display='flex';
+});
+installBtn.addEventListener('click',async()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const {outcome}=await deferredPrompt.userChoice;
+  deferredPrompt=null; installBtn.style.display='none';
+  if(outcome==='accepted') toast('📲 تم تثبيت التطبيق، بارك الله فيك');
+});
+window.addEventListener('appinstalled',()=>{
+  installBtn.style.display='none'; deferredPrompt=null;
+  toast('✅ تم إضافة التطبيق للشاشة الرئيسية');
+});
+if(isStandalone && notifNoteEl){
+  notifNoteEl.textContent='التطبيق مثبّت ويعمل بدون إنترنت. سيذكّرك بعد كل صلاة لتسجّل تقدمك.';
+}
 </script>
 </body>
 </html>
