@@ -258,6 +258,17 @@
   .trow.now{color:var(--gold); font-weight:800;}
   .trow .tn{display:flex; align-items:center; gap:8px;}
 
+  .adhkar-btn{width:100%; margin-top:10px; padding:11px; border-radius:12px; border:1px solid var(--gold-d); background:#7c4a1e22; color:var(--gold); font-family:inherit; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;}
+  .adhkar-btn:active{transform:scale(.98);}
+  /* dhikr cards inside modal */
+  .dhikr{background:#0c2a1d; border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:10px; cursor:pointer; transition:.12s; -webkit-user-select:none; user-select:none;}
+  .dhikr:active{transform:scale(.99);}
+  .dhikr.done{border-color:var(--green-d); background:#16a34a1a;}
+  .dhikr .dtext{font-size:15px; line-height:1.9; color:var(--txt);}
+  .dhikr .dfoot{display:flex; align-items:center; justify-content:space-between; margin-top:10px; gap:8px;}
+  .dhikr .dhint{font-size:11px; color:var(--muted);}
+  .dhikr .dcount{font-size:13px; font-weight:800; color:var(--gold); background:#0a2418; border:1px solid var(--gold-d); border-radius:99px; padding:5px 14px; min-width:70px; text-align:center; flex:none; direction:ltr; unicode-bidi:isolate;}
+  .dhikr.done .dcount{color:#6ee7a0; border-color:var(--green-d);}
   .note-row{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); cursor:pointer; font-size:12.5px;}
   .note-add{color:var(--muted);}
   .note-txt{color:#cfe7db; line-height:1.5; display:block;}
@@ -424,6 +435,14 @@
     <div class="sheet-head"><b>اختر مدينتك</b><button id="cityClose" aria-label="إغلاق">✕</button></div>
     <input class="city-search" id="citySearch" type="text" placeholder="ابحث عن مدينة…" autocomplete="off">
     <div class="city-list" id="cityList"></div>
+  </div>
+</div>
+
+<div class="modal" id="adhkarModal">
+  <div class="sheet">
+    <div class="sheet-head"><b>📿 أذكار بعد الصلاة <span id="adhkarFor" style="color:var(--muted);font-weight:600;font-size:13px"></span></b><button id="adhkarClose" aria-label="إغلاق">✕</button></div>
+    <div class="city-list" id="adhkarList"></div>
+    <button class="tool-btn" id="adhkarReset" style="margin-top:10px">🔄 تصفير العدّاد</button>
   </div>
 </div>
 
@@ -761,12 +780,16 @@ function renderPrayers(){
       </div>
       <div class="note-row" data-note="${p.id}">
         ${noteFor(key,p.id) ? '<span class="note-txt">📝 '+esc(noteFor(key,p.id))+'</span>' : '<span class="note-add">📝 أضف ملاحظة</span>'}
-      </div>`;
+      </div>
+      ${cur!=null ? `<button class="adhkar-btn" data-pname="${p.name}">📿 قراءة أذكار ما بعد الصلاة</button>` : ''}`;
     list.appendChild(card);
   });
   // bind
   list.querySelectorAll('.note-row').forEach(el=>{
     el.addEventListener('click',()=>editNote(key, el.dataset.note));
+  });
+  list.querySelectorAll('.adhkar-btn').forEach(el=>{
+    el.addEventListener('click',()=>openAdhkar(el.dataset.pname));
   });
   list.querySelectorAll('.lvl').forEach(el=>{
     el.addEventListener('click',()=>setLevel(el.dataset.p, el.dataset.l));
@@ -1071,6 +1094,56 @@ document.getElementById('cityBtn').addEventListener('click',openCityModal);
 document.getElementById('cityClose').addEventListener('click',closeCityModal);
 cityModal.addEventListener('click',e=>{ if(e.target===cityModal) closeCityModal(); });
 citySearch.addEventListener('input',()=>renderCityList(citySearch.value));
+
+/* ================= أذكار ما بعد الصلاة ================= */
+const ADHKAR=[
+  {text:'أَسْتَغْفِرُ اللَّهَ', c:3},
+  {text:'اللَّهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ', c:1},
+  {text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ. اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ', c:1},
+  {text:'سُبْحَانَ اللَّهِ', c:33},
+  {text:'الْحَمْدُ لِلَّهِ', c:33},
+  {text:'اللَّهُ أَكْبَرُ', c:33},
+  {text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ (تمام المئة)', c:1},
+  {text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ، لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ… وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
+  {text:'قُلْ هُوَ اللَّهُ أَحَدٌ (سورة الإخلاص)', c:3},
+  {text:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (سورة الفلق)', c:3},
+  {text:'قُلْ أَعُوذُ بِرَبِّ النَّاسِ (سورة الناس)', c:3},
+];
+let adhkarCounts=[];
+const adhkarModal=document.getElementById('adhkarModal');
+const adhkarList=document.getElementById('adhkarList');
+function openAdhkar(prayerName){
+  adhkarCounts=ADHKAR.map(()=>0);
+  document.getElementById('adhkarFor').textContent = prayerName? ('— بعد '+prayerName):'';
+  renderAdhkarList();
+  adhkarModal.classList.add('show');
+  adhkarList.scrollTop=0;
+}
+function closeAdhkar(){ adhkarModal.classList.remove('show'); }
+function renderAdhkarList(){
+  adhkarList.innerHTML=ADHKAR.map((a,i)=>{
+    const done=adhkarCounts[i]>=a.c;
+    return `<div class="dhikr${done?' done':''}" data-i="${i}">
+      <div class="dtext">${a.text}</div>
+      <div class="dfoot">
+        <span class="dhint">${a.c>1?'اضغط للعدّ':'اضغط عند الانتهاء'}</span>
+        <span class="dcount">${done?'✓ ':''}${adhkarCounts[i]} / ${a.c}</span>
+      </div>
+    </div>`;
+  }).join('');
+  adhkarList.querySelectorAll('.dhikr').forEach(el=> el.addEventListener('click',()=>tapDhikr(+el.dataset.i)));
+}
+function tapDhikr(i){
+  if(adhkarCounts[i]<ADHKAR[i].c){ adhkarCounts[i]++; if(navigator.vibrate) navigator.vibrate(8); }
+  const el=adhkarList.querySelector('.dhikr[data-i="'+i+'"]');
+  const done=adhkarCounts[i]>=ADHKAR[i].c;
+  el.classList.toggle('done',done);
+  el.querySelector('.dcount').textContent=(done?'✓ ':'')+adhkarCounts[i]+' / '+ADHKAR[i].c;
+  if(adhkarCounts.every((n,idx)=>n>=ADHKAR[idx].c)) toast('📿 تقبّل الله، أتممت الأذكار');
+}
+document.getElementById('adhkarClose').addEventListener('click',closeAdhkar);
+document.getElementById('adhkarReset').addEventListener('click',()=>{ adhkarCounts=ADHKAR.map(()=>0); renderAdhkarList(); });
+adhkarModal.addEventListener('click',e=>{ if(e.target===adhkarModal) closeAdhkar(); });
 
 /* ================= TOOLS: export / import / calendar / share ================= */
 function downloadBlob(blob, filename){
