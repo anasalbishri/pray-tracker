@@ -1,6 +1,6 @@
 /* Service worker for متابعة الصلاة (Salah tracker PWA).
    Bump CACHE version whenever the app shell changes so clients update. */
-const CACHE = 'salah-tracker-v2';
+const CACHE = 'salah-tracker-v3';
 const ASSETS = [
   './',
   './index.html',

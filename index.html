@@ -234,7 +234,25 @@
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 #e9c46a00;} 50%{box-shadow:0 0 0 2px #e9c46a99;}}
   .due-flag{font-size:11px; color:var(--gold); font-weight:800; margin-top:8px; display:flex; align-items:center; gap:5px;}
 
+  .city-chip{border:1px solid var(--gold-d); background:#7c4a1e22; color:var(--gold); font-family:inherit; font-weight:700; font-size:12px; padding:5px 10px; border-radius:99px; cursor:pointer;}
   .times-card{background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:6px 14px; margin-top:12px;}
+
+  /* City picker modal */
+  .modal{position:fixed; inset:0; z-index:200; display:none; align-items:flex-end; justify-content:center; background:#0009; backdrop-filter:blur(3px);}
+  .modal.show{display:flex; animation:fade .25s;}
+  .sheet{background:var(--bg2); border:1px solid var(--line); border-radius:22px 22px 0 0; width:100%; max-width:520px; max-height:82vh; display:flex; flex-direction:column; padding:16px 16px calc(env(safe-area-inset-bottom) + 16px); box-shadow:0 -12px 40px -10px #000;}
+  .sheet-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .sheet-head b{font-size:17px;}
+  .sheet-head button{width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:var(--card-solid); color:var(--txt); font-size:15px; cursor:pointer;}
+  .city-search{width:100%; padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:#0a2418; color:var(--txt); font-family:inherit; font-size:15px; margin-bottom:10px;}
+  .city-search::placeholder{color:var(--muted);}
+  .city-list{overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .city-row{display:flex; align-items:center; gap:10px; padding:13px 12px; border-radius:12px; cursor:pointer; font-size:15px;}
+  .city-row:active{background:#0a2418;}
+  .city-row.sel{background:#16a34a22; border:1px solid var(--green-d);}
+  .city-row .cflag{font-size:18px;}
+  .city-row .ccheck{margin-inline-start:auto; color:var(--gold); font-weight:800;}
+  .city-empty{text-align:center; color:var(--muted); padding:24px; font-size:14px;}
   .trow{display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-top:1px solid var(--line); font-size:14px;}
   .trow:first-child{border-top:0;}
   .trow.now{color:var(--gold); font-weight:800;}
@@ -317,7 +335,10 @@
     <div class="sec-title"><span class="bar"></span> صلوات اليوم</div>
     <div id="prayerList"></div>
 
-    <div class="sec-title"><span class="bar"></span> أوقات الصلاة — جدة</div>
+    <div class="sec-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:8px"><span class="bar"></span> أوقات الصلاة — <span id="cityName">جدة</span></span>
+      <button id="cityBtn" class="city-chip">📍 تغيير المدينة</button>
+    </div>
     <div class="times-card" id="timesCard"></div>
   </div>
 
@@ -374,6 +395,14 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="modal" id="cityModal">
+  <div class="sheet">
+    <div class="sheet-head"><b>اختر مدينتك</b><button id="cityClose" aria-label="إغلاق">✕</button></div>
+    <input class="city-search" id="citySearch" type="text" placeholder="ابحث عن مدينة…" autocomplete="off">
+    <div class="city-list" id="cityList"></div>
+  </div>
+</div>
 
 <nav>
   <button data-page="today" class="on"><span class="ni">🕌</span>اليوم</button>
@@ -434,6 +463,7 @@ function load(){
   if(!d.ach) d.ach={};
   if(!d.notes) d.notes={};
   if(!d.frozenDays) d.frozenDays={};
+  if(!d.city) d.city='jeddah';
   if(typeof d.freezes!=='number') d.freezes=1;      // تجميدة مجانية في البداية
   if(typeof d.freezeMilestone!=='number') d.freezeMilestone=0;
   return d;
@@ -454,8 +484,60 @@ function hijri(d){
 }
 
 /* ================= PRAYER TIMES ENGINE (Umm al-Qura) =================
-   جدة: خط عرض 21.5433 ، خط طول 39.1728 ، المنطقة الزمنية +3 */
-const CITY = {name:'جدة', lat:21.5433, lng:39.1728, tz:3, fajrAngle:18.5, ishaMin:90};
+   المدن: خط العرض/الطول + المنطقة الزمنية (IANA) لحساب DST تلقائياً */
+const CITIES = [
+  {id:'jeddah',   name:'جدة',            lat:21.5433, lng:39.1728, tz:'Asia/Riyadh'},
+  {id:'makkah',   name:'مكة المكرمة',    lat:21.3891, lng:39.8579, tz:'Asia/Riyadh'},
+  {id:'madinah',  name:'المدينة المنورة',lat:24.5247, lng:39.5692, tz:'Asia/Riyadh'},
+  {id:'riyadh',   name:'الرياض',         lat:24.7136, lng:46.6753, tz:'Asia/Riyadh'},
+  {id:'dammam',   name:'الدمام',         lat:26.4207, lng:50.0888, tz:'Asia/Riyadh'},
+  {id:'taif',     name:'الطائف',         lat:21.2854, lng:40.4183, tz:'Asia/Riyadh'},
+  {id:'abha',     name:'أبها',           lat:18.2164, lng:42.5053, tz:'Asia/Riyadh'},
+  {id:'tabuk',    name:'تبوك',           lat:28.3838, lng:36.5550, tz:'Asia/Riyadh'},
+  {id:'buraidah', name:'بريدة',          lat:26.3260, lng:43.9750, tz:'Asia/Riyadh'},
+  {id:'hail',     name:'حائل',           lat:27.5114, lng:41.7208, tz:'Asia/Riyadh'},
+  {id:'jazan',    name:'جازان',          lat:16.8892, lng:42.5706, tz:'Asia/Riyadh'},
+  {id:'najran',   name:'نجران',          lat:17.4924, lng:44.1277, tz:'Asia/Riyadh'},
+  {id:'kuwait',   name:'الكويت',         lat:29.3759, lng:47.9774, tz:'Asia/Kuwait'},
+  {id:'doha',     name:'الدوحة',         lat:25.2854, lng:51.5310, tz:'Asia/Qatar'},
+  {id:'manama',   name:'المنامة',        lat:26.2285, lng:50.5860, tz:'Asia/Bahrain'},
+  {id:'dubai',    name:'دبي',            lat:25.2048, lng:55.2708, tz:'Asia/Dubai'},
+  {id:'abudhabi', name:'أبوظبي',         lat:24.4539, lng:54.3773, tz:'Asia/Dubai'},
+  {id:'muscat',   name:'مسقط',           lat:23.5880, lng:58.3829, tz:'Asia/Muscat'},
+  {id:'amman',    name:'عمّان',          lat:31.9454, lng:35.9284, tz:'Asia/Amman'},
+  {id:'cairo',    name:'القاهرة',        lat:30.0444, lng:31.2357, tz:'Africa/Cairo'},
+  {id:'jerusalem',name:'القدس',          lat:31.7683, lng:35.2137, tz:'Asia/Hebron'},
+  {id:'beirut',   name:'بيروت',          lat:33.8938, lng:35.5018, tz:'Asia/Beirut'},
+  {id:'baghdad',  name:'بغداد',          lat:33.3152, lng:44.3661, tz:'Asia/Baghdad'},
+  {id:'damascus', name:'دمشق',           lat:33.5138, lng:36.2765, tz:'Asia/Damascus'},
+  {id:'khartoum', name:'الخرطوم',        lat:15.5007, lng:32.5599, tz:'Africa/Khartoum'},
+  {id:'sanaa',    name:'صنعاء',          lat:15.3694, lng:44.1910, tz:'Asia/Aden'},
+  {id:'istanbul', name:'إسطنبول',        lat:41.0082, lng:28.9784, tz:'Europe/Istanbul'},
+  {id:'london',   name:'لندن',           lat:51.5074, lng:-0.1278, tz:'Europe/London'},
+  {id:'paris',    name:'باريس',          lat:48.8566, lng:2.3522,  tz:'Europe/Paris'},
+  {id:'berlin',   name:'برلين',          lat:52.5200, lng:13.4050, tz:'Europe/Berlin'},
+  {id:'newyork',  name:'نيويورك',        lat:40.7128, lng:-74.0060,tz:'America/New_York'},
+  {id:'toronto',  name:'تورنتو',         lat:43.6532, lng:-79.3832,tz:'America/Toronto'},
+  {id:'kualalumpur',name:'كوالالمبور',   lat:3.1390,  lng:101.6869,tz:'Asia/Kuala_Lumpur'},
+  {id:'jakarta',  name:'جاكرتا',         lat:-6.2088, lng:106.8456,tz:'Asia/Jakarta'},
+];
+const FAJR_ANGLE=18.5, ISHA_MIN=90; // أم القرى
+const CITY = {}; // المدينة الحالية (تُملأ عبر setCity)
+function setCity(id){
+  const c = CITIES.find(x=>x.id===id) || CITIES[0];
+  CITY.id=c.id; CITY.name=c.name; CITY.lat=c.lat; CITY.lng=c.lng; CITY.tzName=c.tz;
+}
+// إزاحة المنطقة الزمنية (بالساعات) لتاريخ معيّن، مع مراعاة التوقيت الصيفي
+function tzOffsetHours(date, tzName){
+  try{
+    const dtf=new Intl.DateTimeFormat('en-US',{timeZone:tzName,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const p={}; for(const part of dtf.formatToParts(date)) p[part.type]=part.value;
+    let hh=(p.hour==='24')?'00':p.hour;
+    const asUTC=Date.UTC(+p.year,+p.month-1,+p.day,+hh,+p.minute,+p.second);
+    return Math.round((asUTC-date.getTime())/60000)/60;
+  }catch(e){ return 3; }
+}
+setCity(DB.city);
 const PT = (function(){
   const dtr=d=>d*Math.PI/180, rtd=r=>r*180/Math.PI;
   const sin=d=>Math.sin(dtr(d)), cos=d=>Math.cos(dtr(d)), tan=d=>Math.tan(dtr(d));
@@ -471,13 +553,15 @@ const PT = (function(){
   function compute(date){
     jDate = julian(date.getFullYear(),date.getMonth()+1,date.getDate()) - CITY.lng/(15*24);
     let r={};
-    r.fajr    = angleTime(CITY.fajrAngle, 5/24, true);
+    r.fajr    = angleTime(FAJR_ANGLE, 5/24, true);
     r.sunrise = angleTime(0.833, 6/24, true);
     r.dhuhr   = midDay(12/24) + 1/60;      // زيادة دقيقة احتياطاً بعد الزوال
     r.asr     = asrTime(13/24);
     r.maghrib = angleTime(0.833, 18/24, false);
-    r.isha    = r.maghrib + CITY.ishaMin/60;
-    const adj = CITY.tz - CITY.lng/15;
+    r.isha    = r.maghrib + ISHA_MIN/60;
+    // خطوط العرض العالية: إذا تعذّر حساب الفجر بالزاوية، نستخدم قاعدة سُبع الليل
+    if(isNaN(r.fajr)){ const night=(24-r.maghrib)+r.sunrise; r.fajr=r.sunrise-night/7; }
+    const adj = tzOffsetHours(date, CITY.tzName) - CITY.lng/15;
     for(let k in r) r[k]=fixHour(r[k]+adj);
     return r;
   }
@@ -882,10 +966,38 @@ document.getElementById('prevDay').addEventListener('click',()=>{ viewDate.setDa
 document.getElementById('nextDay').addEventListener('click',()=>{ if(ymd(viewDate)!==ymd(new Date())){ viewDate.setDate(viewDate.getDate()+1); renderPrayers(); } });
 document.getElementById('resetBtn').addEventListener('click',()=>{
   if(confirm('هل تريد حذف كل بياناتك والبدء من جديد؟ لا يمكن التراجع.')){
-    DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0}; save(); viewDate=new Date();
+    DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:CITY.id}; save(); viewDate=new Date();
     renderPrayers(); renderHero(); renderAch(); toast('تم حذف البيانات');
   }
 });
+
+/* ================= CITY PICKER ================= */
+const cityModal=document.getElementById('cityModal');
+const cityList=document.getElementById('cityList');
+const citySearch=document.getElementById('citySearch');
+function updateCityName(){ const el=document.getElementById('cityName'); if(el) el.textContent=CITY.name; }
+function renderCityList(filter=''){
+  const q=filter.trim();
+  const items=CITIES.filter(c=> !q || c.name.includes(q));
+  if(!items.length){ cityList.innerHTML='<div class="city-empty">ما لقينا مدينة بهذا الاسم</div>'; return; }
+  cityList.innerHTML=items.map(c=>`
+    <div class="city-row${c.id===CITY.id?' sel':''}" data-city="${c.id}">
+      <span class="cflag">📍</span><span>${c.name}</span>
+      ${c.id===CITY.id?'<span class="ccheck">✓</span>':''}
+    </div>`).join('');
+  cityList.querySelectorAll('.city-row').forEach(el=> el.addEventListener('click',()=>selectCity(el.dataset.city)));
+}
+function openCityModal(){ citySearch.value=''; renderCityList(''); cityModal.classList.add('show'); }
+function closeCityModal(){ cityModal.classList.remove('show'); }
+function selectCity(id){
+  setCity(id); DB.city=id; save();
+  updateCityName(); renderPrayers();
+  closeCityModal(); toast('📍 تم اختيار '+CITY.name);
+}
+document.getElementById('cityBtn').addEventListener('click',openCityModal);
+document.getElementById('cityClose').addEventListener('click',closeCityModal);
+cityModal.addEventListener('click',e=>{ if(e.target===cityModal) closeCityModal(); });
+citySearch.addEventListener('input',()=>renderCityList(citySearch.value));
 
 /* ================= TOOLS: export / import / calendar / share ================= */
 function downloadBlob(blob, filename){
@@ -910,8 +1022,8 @@ document.getElementById('importFile').addEventListener('change',e=>{
       const obj=JSON.parse(r.result);
       if(!obj.days) throw new Error('ملف غير صالح');
       if(!confirm('سيتم استبدال بياناتك الحالية ببيانات الملف. متابعة؟')) return;
-      DB=Object.assign({days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0}, obj);
-      save(); viewDate=new Date();
+      DB=Object.assign({days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:'jeddah'}, obj);
+      save(); viewDate=new Date(); setCity(DB.city); updateCityName();
       renderPrayers(); renderHero(); renderAch(); toast('📥 تم استيراد البيانات بنجاح');
     }catch(err){ toast('تعذّر قراءة الملف — تأكد أنه نسخة صحيحة'); }
   };
@@ -929,11 +1041,10 @@ document.getElementById('calBtn').addEventListener('click',()=>{
     const d=new Date(base); d.setDate(base.getDate()+i);
     const times=prayerTimesFor(d);
     PRAYERS.forEach(p=>{
-      let h=times[p.id]+offsetMin/60;
-      const hh=Math.floor(h), mm=Math.round((h-hh)*60);
-      // وقت محلي (جدة +3) نحوّله UTC: نطرح 3 ساعات
-      const local=new Date(d.getFullYear(),d.getMonth(),d.getDate(),hh,mm,0);
-      const utc=new Date(local.getTime()-CITY.tz*3600000);
+      const h=times[p.id]+offsetMin/60;
+      // نحوّل الوقت المحلي للمدينة إلى UTC باستخدام إزاحة المدينة لذلك اليوم (يراعي DST)
+      const off=tzOffsetHours(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate(),12,0,0)), CITY.tzName);
+      const utc=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate(),0,0,0) + Math.round((h-off)*60)*60000);
       const end=new Date(utc.getTime()+5*60000);
       const uid=ymd(d)+'-'+p.id+'@salah';
       ics+='BEGIN:VEVENT\r\nUID:'+uid+'\r\nDTSTAMP:'+icsStamp(new Date())+'\r\nDTSTART:'+icsStamp(utc)+'\r\nDTEND:'+icsStamp(end)+'\r\nSUMMARY:📿 سجّل صلاة '+p.name+'\r\nDESCRIPTION:افتح تطبيق متابعة الصلاة وسجّل مستوى صلاتك\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:سجّل صلاة '+p.name+'\r\nTRIGGER:PT0M\r\nEND:VALARM\r\nEND:VEVENT\r\n';
@@ -1023,6 +1134,7 @@ function fireReminder(p){
 
 /* ================= INIT ================= */
 document.getElementById('hijriDate').textContent=hijri(new Date());
+updateCityName();
 updateNotifBtn();
 renderHero(); renderPrayers(); renderAch();
 reminderCheck();
