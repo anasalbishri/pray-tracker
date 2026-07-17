@@ -104,7 +104,7 @@
   .bonus-row.on{border-style:solid; border-color:var(--green-d); background:#16a34a1a; color:#6ee7a0;}
   .bonus-pts{font-weight:900; background:#0a2418; border:1px solid var(--gold-d); border-radius:99px; padding:3px 11px; direction:ltr; unicode-bidi:isolate;}
   .bonus-row.on .bonus-pts{color:#6ee7a0; border-color:var(--green-d);}
-  .fly-pts{position:fixed; z-index:300; font-weight:900; font-size:22px; color:var(--gold); text-shadow:0 2px 10px #000c, 0 0 14px #e9c46a66; pointer-events:none; will-change:transform,opacity;}
+  .fly-pts{position:fixed; z-index:300; font-weight:900; font-size:30px; color:var(--gold); text-shadow:0 2px 12px #000e, 0 0 18px #e9c46a88; pointer-events:none; will-change:transform,opacity;}
 
   .streak-chip{
     display:inline-flex; align-items:center; gap:6px;
@@ -492,7 +492,7 @@
     <div class="sec-title"><span class="bar"></span> التذكير والإشعارات</div>
     <button class="notif-btn" id="installBtn" style="display:none">📲 ثبّت التطبيق على جهازك</button>
     <button class="notif-btn" id="notifBtn">🔔 فعّل تذكير الصلاة</button>
-    <div class="notif-note" id="notifNote">التذكير يشتغل والتطبيق مفتوح. أضف التطبيق للشاشة الرئيسية ليعمل بشكل أفضل.</div>
+    <div class="notif-note" id="notifNote">الإشعارات الفورية تعمل بثبات أكبر عند إضافة التطبيق للشاشة الرئيسية. للتذكير المضمون حتى والتطبيق مغلق (خاصة على iPhone)، استخدم «تذكيرات التقويم» في قسم الأدوات بالأسفل.</div>
 
     <div class="sec-title"><span class="bar"></span> أدوات</div>
     <button class="tool-btn gold" id="shareBtn"><span class="te">📤</span> شارك بطاقة إنجازك (صورة)</button>
@@ -962,7 +962,7 @@ function updateDaily(animate){
     if(sub) sub.textContent = target>=DAY_MAX ? '💎 يوم مثالي! أكملت ١٠٠ نقطة' : 'كل صلاة حتى ٢٠ نقطة + مكافآت إضافية ٥';
   }
   if(animate){
-    const from=displayedDaily, to=target, t0=performance.now(), dur=550;
+    const from=displayedDaily, to=target, t0=performance.now(), dur=1000;
     (function step(t){ const k=Math.min(1,(t-t0)/dur); numEl.textContent=Math.round(from+(to-from)*k); if(k<1) requestAnimationFrame(step); })(t0);
     card.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:340,easing:'ease-out'});
   }else{
@@ -978,7 +978,7 @@ function toggleBonus(pid, bid, fromEl){
   const b=DB.days[key].bonus[pid];
   const turningOn = !b[bid];
   const rect = (turningOn && fromEl) ? fromEl.getBoundingClientRect() : null;
-  if(turningOn) b[bid]=true; else delete b[bid];
+  if(turningOn){ b[bid]=true; buzz(18); } else delete b[bid];
   if(Object.keys(b).length===0) delete DB.days[key].bonus[pid];
   save();
   _flyingDaily = !!rect;
@@ -997,14 +997,15 @@ function flyPoints(rect, amount){
   chip.className='fly-pts'; chip.textContent='+'+amount;
   chip.style.left=fx+'px'; chip.style.top=fy+'px';
   document.body.appendChild(chip);
-  // حركة أبطأ وأوضح: يظهر الرقم كبيراً وثابتاً، يرتفع قليلاً، ثم يسير بهدوء للعدّاد
+  // حركة أبطأ وأوضح: يظهر الرقم كبيراً وثابتاً فترة كافية ليُقرأ، ثم يسير بهدوء للعدّاد
   const anim=chip.animate([
     {transform:'translate(-50%,-50%) scale(.6)', opacity:0, offset:0},
-    {transform:'translate(-50%,-50%) scale(1.35)', opacity:1, offset:0.15},
-    {transform:`translate(-50%, calc(-50% - 34px)) scale(1.35)`, opacity:1, offset:0.42},
-    {transform:`translate(calc(-50% + ${dx*0.6}px), calc(-50% + ${dy*0.6 - 30}px)) scale(1.2)`, opacity:1, offset:0.72},
+    {transform:'translate(-50%,-50%) scale(1.5)', opacity:1, offset:0.10},
+    {transform:`translate(-50%, calc(-50% - 40px)) scale(1.5)`, opacity:1, offset:0.28},
+    {transform:`translate(-50%, calc(-50% - 40px)) scale(1.5)`, opacity:1, offset:0.58},
+    {transform:`translate(calc(-50% + ${dx*0.6}px), calc(-50% + ${dy*0.6 - 34}px)) scale(1.3)`, opacity:1, offset:0.82},
     {transform:`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.7)`, opacity:0, offset:1}
-  ], {duration:1300, easing:'cubic-bezier(.35,0,.25,1)'});
+  ], {duration:2200, easing:'cubic-bezier(.35,0,.25,1)'});
   anim.onfinish=()=>{ chip.remove(); _flyingDaily=false; updateDaily(true); };
   anim.oncancel=()=>{ chip.remove(); _flyingDaily=false; updateDaily(true); };
 }
@@ -1051,7 +1052,7 @@ function setLevel(pid, lid, fromEl){
   const rect = (selecting && fromEl) ? fromEl.getBoundingClientRect() : null;
   const amount = selecting ? lvlById(lid).d20 : 0;
   if(!selecting){ delete DB.days[key][pid]; if(DB.days[key].bonus) delete DB.days[key].bonus[pid]; }
-  else { DB.days[key][pid]=lid; }
+  else { DB.days[key][pid]=lid; buzz(18); }
   save();
   _flyingDaily = !!rect; // امنع تحديث العدّاد فوراً حتى تصل الحركة
   renderPrayers(); renderHero();
@@ -1251,6 +1252,8 @@ function renderAch(){
 }
 
 /* ================= UI PLUMBING ================= */
+// اهتزاز لطيف عند التفاعل (يعمل على أندرويد؛ متصفح iOS لا يدعم الاهتزاز)
+function buzz(pattern){ try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){} }
 let toastT;
 function toast(msg){
   const t=document.getElementById('toast');
@@ -1357,7 +1360,7 @@ function renderAdhkarList(){
   adhkarList.querySelectorAll('.dhikr').forEach(el=> el.addEventListener('click',()=>tapDhikr(+el.dataset.i)));
 }
 function tapDhikr(i){
-  if(adhkarCounts[i]<ADHKAR[i].c){ adhkarCounts[i]++; if(navigator.vibrate) navigator.vibrate(8); }
+  if(adhkarCounts[i]<ADHKAR[i].c){ adhkarCounts[i]++; buzz(8); }
   const el=adhkarList.querySelector('.dhikr[data-i="'+i+'"]');
   const done=adhkarCounts[i]>=ADHKAR[i].c;
   el.classList.toggle('done',done);
@@ -1471,7 +1474,7 @@ notifBtn.addEventListener('click',()=>{
   if(!('Notification' in window)){ toast('متصفحك لا يدعم الإشعارات'); return; }
   Notification.requestPermission().then(p=>{
     updateNotifBtn();
-    if(p==='granted'){ toast('🔔 تم تفعيل التذكير'); try{ new Notification('متابعة الصلاة',{body:'سنذكّرك بعد كل صلاة لتسجّل تقدمك 🕌'}); }catch(e){} }
+    if(p==='granted'){ toast('🔔 تم تفعيل التذكير'); try{ new Notification('متابعة الصلاة',{body:'سنذكّرك بعد كل صلاة لتسجّل تقدمك 🕌'}); }catch(e){} scheduleReminders(); }
     else toast('لم يتم منح الإذن');
   });
 });
@@ -1496,9 +1499,48 @@ function reminderCheck(){
 function fireReminder(p){
   const msg='حان وقت '+p.name+' — لا تنسَ تسجّل صلاتك في التطبيق 🕌';
   toast('⏰ '+p.name+' — سجّل صلاتك');
+  buzz([140,70,140]);
   if(('Notification' in window) && Notification.permission==='granted'){
-    try{ new Notification('متابعة الصلاة · '+p.name, {body:msg, tag:'salah-'+p.id}); }catch(e){}
+    // الأفضل عبر Service Worker (يظهر بثبات أكبر ويعمل من الخلفية على المتصفحات الداعمة)
+    if(navigator.serviceWorker && navigator.serviceWorker.ready){
+      navigator.serviceWorker.ready.then(reg=>{
+        try{ reg.showNotification('متابعة الصلاة · '+p.name, {body:msg, tag:'salah-'+p.id, icon:'icons/icon-192.png', badge:'icons/icon-192.png', vibrate:[140,70,140]}); }
+        catch(e){ try{ new Notification('متابعة الصلاة · '+p.name, {body:msg, tag:'salah-'+p.id}); }catch(e2){} }
+      }).catch(()=>{ try{ new Notification('متابعة الصلاة · '+p.name, {body:msg, tag:'salah-'+p.id}); }catch(e){} });
+    }else{
+      try{ new Notification('متابعة الصلاة · '+p.name, {body:msg, tag:'salah-'+p.id}); }catch(e){}
+    }
   }
+}
+
+// جدولة إشعارات الصلوات القادمة لتظهر حتى لو كان التطبيق مغلقاً (على المتصفحات الداعمة لـ Notification Triggers)
+async function scheduleReminders(){
+  if(!('serviceWorker' in navigator)) return;
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  if(!('TimestampTrigger' in window)) return; // المتصفح لا يدعم الجدولة أثناء الإغلاق
+  let reg; try{ reg=await navigator.serviceWorker.ready; }catch(e){ return; }
+  // نظّف الإشعارات المجدولة سابقاً حتى لا تتكرر
+  try{ const olds=await reg.getNotifications({includeTriggered:true}); olds.forEach(n=>{ if(n.tag&&n.tag.indexOf('salah-sched-')===0) n.close(); }); }catch(e){}
+  const now=Date.now();
+  const scheduleDay=(date)=>{
+    const times=prayerTimesFor(date);
+    const key=ymd(date);
+    const midnight=new Date(date); midnight.setHours(0,0,0,0);
+    PRAYERS.forEach(p=>{
+      const ts=midnight.getTime()+Math.round(times[p.id]*3600*1000);
+      if(ts<=now+60000) return;                       // فات وقتها أو قريب جداً
+      if((DB.days[key]||{})[p.id]!=null) return;       // مسجّلة أصلاً
+      try{
+        reg.showNotification('متابعة الصلاة · '+p.name, {
+          body:'حان وقت '+p.name+' — لا تنسَ تسجّل صلاتك 🕌',
+          tag:'salah-sched-'+key+'-'+p.id, icon:'icons/icon-192.png', badge:'icons/icon-192.png',
+          vibrate:[140,70,140], showTrigger:new TimestampTrigger(ts)
+        });
+      }catch(e){}
+    });
+  };
+  scheduleDay(new Date());
+  scheduleDay(new Date(now+86400000)); // الغد أيضاً
 }
 
 /* ================= INIT ================= */
@@ -1507,9 +1549,10 @@ updateCityName();
 updateNotifBtn();
 renderHero(); renderPrayers(); renderAch();
 reminderCheck();
+scheduleReminders();
 setInterval(()=>{ reminderCheck(); if(document.getElementById('page-today').classList.contains('active')){ renderNextPrayer(); } }, 30000);
 // حدّث عند العودة للتطبيق
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ viewDate=new Date(); renderPrayers(); renderHero(); reminderCheck(); } });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ viewDate=new Date(); renderPrayers(); renderHero(); reminderCheck(); scheduleReminders(); } });
 
 /* ================= PWA: service worker + install ================= */
 if('serviceWorker' in navigator){
@@ -1555,7 +1598,7 @@ window.addEventListener('appinstalled',()=>{
   toast('✅ تم إضافة التطبيق للشاشة الرئيسية');
 });
 if(isStandalone && notifNoteEl){
-  notifNoteEl.textContent='التطبيق مثبّت ويعمل بدون إنترنت. سيذكّرك بعد كل صلاة لتسجّل تقدمك.';
+  notifNoteEl.textContent='التطبيق مثبّت ويعمل بدون إنترنت. للتذكير المضمون حتى والتطبيق مغلق، استخدم «تذكيرات التقويم» في قسم الأدوات بالأسفل.';
 }
 </script>
 </body>
