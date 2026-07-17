@@ -83,6 +83,27 @@
   .daily-info{flex:1;}
   .daily-title{font-size:16px; font-weight:800; color:var(--gold);}
   .daily-sub{font-size:11.5px; color:var(--muted); margin-top:5px; line-height:1.6;}
+  /* prominent daily card on the Today page */
+  .daily-card.big{padding:20px; margin-top:6px; box-shadow:0 14px 32px -14px #000b, inset 0 1px 0 #ffffff14;}
+  .daily-card.big .daily-ringwrap{width:122px; height:122px;}
+  .daily-card.big .daily-svg{width:122px; height:122px;}
+  .daily-card.big .daily-center b{font-size:36px;}
+  .daily-card.big .daily-center span{font-size:12px;}
+  .daily-card.big .daily-title{font-size:20px;}
+  .daily-card.big .daily-sub{font-size:12.5px;}
+  /* strong state: exceeded 100 (extra worship) */
+  .daily-card.strong{background:linear-gradient(145deg,#8a5a22,#3a2a12); border-color:var(--gold); box-shadow:0 0 0 1px var(--gold-d) inset, 0 14px 36px -12px #e9c46a66, inset 0 1px 0 #ffffff22; animation:strongPulse 2.2s ease-in-out infinite;}
+  @keyframes strongPulse{0%,100%{box-shadow:0 0 0 1px var(--gold-d) inset, 0 14px 36px -14px #e9c46a55, inset 0 1px 0 #ffffff22;} 50%{box-shadow:0 0 0 1px var(--gold) inset, 0 16px 42px -10px #e9c46a99, inset 0 1px 0 #ffffff22;}}
+  .daily-card.strong .daily-title{color:#ffe6a3;}
+  .daily-card.strong .daily-center b{color:#ffe6a3;}
+  .daily-card.strong .daily-sub{color:#e9c46a;}
+
+  /* bonus box (extra +5) */
+  .bonus-row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; padding:10px 12px; border-radius:12px; border:1px dashed var(--gold-d); background:#7c4a1e14; color:var(--gold); cursor:pointer; font-size:12.5px; font-weight:700; transition:.15s; -webkit-user-select:none; user-select:none;}
+  .bonus-row:active{transform:scale(.98);}
+  .bonus-row.on{border-style:solid; border-color:var(--green-d); background:#16a34a1a; color:#6ee7a0;}
+  .bonus-pts{font-weight:900; background:#0a2418; border:1px solid var(--gold-d); border-radius:99px; padding:3px 11px; direction:ltr; unicode-bidi:isolate;}
+  .bonus-row.on .bonus-pts{color:#6ee7a0; border-color:var(--green-d);}
   .fly-pts{position:fixed; z-index:300; font-weight:900; font-size:22px; color:var(--gold); text-shadow:0 2px 10px #000c, 0 0 14px #e9c46a66; pointer-events:none; will-change:transform,opacity;}
 
   .streak-chip{
@@ -346,27 +367,7 @@
 
   <!-- ===================== TODAY ===================== -->
   <div class="page active" id="page-today">
-    <div class="hero">
-      <div class="rank-row">
-        <div class="rank-emoji" id="rankEmoji">🌱</div>
-        <div class="rank-info">
-          <div class="rank-name" id="rankName">مبتدئ</div>
-          <div class="rank-sub" id="rankSub">ابدأ رحلتك في المحافظة على الصلاة</div>
-        </div>
-        <div class="rank-pts">
-          <b id="totalPts">0</b>
-          <span>نقطة</span>
-        </div>
-      </div>
-      <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
-      <div class="xp-label"><span id="xpNext">التالي: مجتهد</span><span id="xpText">0 / 300</span></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <div class="streak-chip" id="streakChip">🔥 <span id="streakText">0 أيام متتالية</span></div>
-        <div class="streak-chip" id="freezeChip" style="background:#1e3a5f33;border-color:#7db8e855;color:#9fd0f5">🧊 <span id="freezeText">حماية: 0</span></div>
-      </div>
-    </div>
-
-    <div class="daily-card" id="dailyCard">
+    <div class="daily-card big" id="dailyCard">
       <div class="daily-ringwrap">
         <svg class="daily-svg" viewBox="0 0 100 100">
           <circle class="daily-bg" cx="50" cy="50" r="44"></circle>
@@ -376,7 +377,7 @@
       </div>
       <div class="daily-info">
         <div class="daily-title">نقاط اليوم</div>
-        <div class="daily-sub" id="dailySub">كل صلاة حتى ٢٠ نقطة — صلِّ قبل الإقامة لتكمل ١٠٠</div>
+        <div class="daily-sub" id="dailySub">كل صلاة حتى ٢٠ نقطة + مكافآت إضافية ٥</div>
       </div>
     </div>
 
@@ -412,6 +413,26 @@
 
   <!-- ===================== SUMMARY ===================== -->
   <div class="page" id="page-summary">
+    <div class="hero">
+      <div class="rank-row">
+        <div class="rank-emoji" id="rankEmoji">🌱</div>
+        <div class="rank-info">
+          <div class="rank-name" id="rankName">مبتدئ</div>
+          <div class="rank-sub" id="rankSub">ابدأ رحلتك في المحافظة على الصلاة</div>
+        </div>
+        <div class="rank-pts">
+          <b id="totalPts">0</b>
+          <span>نقطة (يوم مثالي)</span>
+        </div>
+      </div>
+      <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+      <div class="xp-label"><span id="xpNext">التالي: مجتهد</span><span id="xpText">0 / 3</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="streak-chip" id="streakChip">🔥 <span id="streakText">0 أيام متتالية</span></div>
+        <div class="streak-chip" id="freezeChip" style="background:#1e3a5f33;border-color:#7db8e855;color:#9fd0f5">🧊 <span id="freezeText">حماية: 0</span></div>
+      </div>
+    </div>
+
     <div class="sec-title"><span class="bar"></span> ملخص أدائك</div>
 
     <div class="feedback" id="feedbackBox">
@@ -532,13 +553,14 @@ const MAX_DAY = PRAYERS.length * 100; // 500
 // يبحث في المجموعة الفعّالة أولاً ثم في كل المجموعات (حتى تُحلّ أي بيانات قديمة)
 const lvlById = id => LEVELS.find(l=>l.id===id) || LEVELS_STD.find(l=>l.id===id) || LEVELS_FEMALE.find(l=>l.id===id);
 
+// النقاط = عدد الأيام الكاملة (١٠٠/١٠٠). كل يوم مثالي = نقطة.
 const RANKS = [
-  {name:'مبتدئ',   emoji:'🌱', min:0,     sub:'ابدأ رحلتك في المحافظة على الصلاة'},
-  {name:'مجتهد',   emoji:'🌿', min:300,   sub:'أنت في الطريق الصحيح، واصل'},
-  {name:'محافظ',   emoji:'🕌', min:900,   sub:'محافظتك على الصلاة تكبر يوماً بعد يوم'},
-  {name:'مُتقن',   emoji:'⭐', min:2000,  sub:'أداؤك متميز، ثبّتك الله'},
-  {name:'قدوة',    emoji:'🌟', min:4000,  sub:'أصبحت قدوة في صلاتك'},
-  {name:'نجم الصف الأول', emoji:'👑', min:7000, sub:'من أهل الصف الأول والتكبيرة الأولى'},
+  {name:'مبتدئ',   emoji:'🌱', min:0,   sub:'ابدأ رحلتك في المحافظة على الصلاة'},
+  {name:'مجتهد',   emoji:'🌿', min:3,   sub:'أنت في الطريق الصحيح، واصل'},
+  {name:'محافظ',   emoji:'🕌', min:10,  sub:'محافظتك على الصلاة تكبر يوماً بعد يوم'},
+  {name:'مُتقن',   emoji:'⭐', min:25,  sub:'أداؤك متميز، ثبّتك الله'},
+  {name:'قدوة',    emoji:'🌟', min:50,  sub:'أصبحت قدوة في صلاتك'},
+  {name:'نجم الصف الأول', emoji:'👑', min:100, sub:'من أهل الصف الأول والتكبيرة الأولى'},
 ];
 
 const ACHIEVEMENTS = [
@@ -549,7 +571,7 @@ const ACHIEVEMENTS = [
   {id:'streak30', e:'🏅', n:'شهر كامل', d:'٣٠ يوماً متتالياً'},
   {id:'first10', e:'🎯', n:'١٠ صف أول', d:'١٠ صلوات في الصف الأول'},
   {id:'nomiss7', e:'🛡️', n:'أسبوع بلا فوات', d:'٧ أيام دون أي صلاة فائتة'},
-  {id:'pts1000', e:'💰', n:'١٠٠٠ نقطة', d:'اجمع ١٠٠٠ نقطة'},
+  {id:'perfect30', e:'💎', n:'٣٠ يوم مثالي', d:'أكمل ٣٠ يوماً بـ ١٠٠/١٠٠'},
 ];
 
 /* ================= STORAGE ================= */
@@ -710,18 +732,39 @@ function dayScore(key){
   PRAYERS.forEach(p=>{ if(d[p.id]!=null){ logged++; s+=lvlById(d[p.id]).pts; } });
   return {score:s, logged, pct: logged? Math.round(s/(logged*100)*100):0};
 }
-// عدّاد اليوم من ١٠٠: كل صلاة حتى ٢٠ نقطة (٢٠/١٥/١٠/٥/٠)
+// عدّاد اليوم من ١٠٠: كل صلاة حتى ٢٠ نقطة (٢٠/١٥/١٠/٥/٠) + مكافآت إضافية ٥ لكل عمل
 const DAY_MAX = PRAYERS.length * 20; // 100
-function dayD20(key){ const d=dayData(key); let s=0; PRAYERS.forEach(p=>{ if(d[p.id]!=null) s+=lvlById(d[p.id]).d20; }); return s; }
+const BONUS_DEFS = {
+  saff:   {label:'🕌 الصف الأول',        pts:5},
+  walk:   {label:'🚶 المشي للمسجد',      pts:5},
+  sunnah: {label:'🌟 سنة راتبة أو نافلة', pts:5},
+};
+// المكافآت المعروضة حسب الوضع (الجماعة تخص الرجال)
+function activeBonusItems(){ return DB.female ? ['sunnah'] : ['saff','walk']; }
+function bonusFor(key,pid,bid){ const d=DB.days[key]; return !!(d && d.bonus && d.bonus[pid] && d.bonus[pid][bid]); }
+function dayD20(key){
+  const d=dayData(key); let s=0;
+  PRAYERS.forEach(p=>{ if(d[p.id]!=null){
+    s+=lvlById(d[p.id]).d20;
+    const b=d.bonus&&d.bonus[p.id];
+    if(b){ for(const k in b){ if(b[k]&&BONUS_DEFS[k]) s+=BONUS_DEFS[k].pts; } }
+  }});
+  return s;
+}
 function isCleanDay(key){ // كل الصلوات مسجلة ولا يوجد فائتة
   const d=dayData(key);
   return PRAYERS.every(p=> d[p.id]!=null && d[p.id]!=='red');
 }
 function isComplete(key){ const d=dayData(key); return PRAYERS.every(p=> d[p.id]!=null); }
 
-function totalPoints(){
-  let t=0; Object.keys(DB.days).forEach(k=> t+=dayScore(k).score); return t;
+// يوم مثالي = كل الصلوات قبل الإقامة (الأساس ١٠٠/١٠٠ بدون احتساب المكافآت)
+function isPerfectDay(key){
+  const d=dayData(key); let s=0;
+  PRAYERS.forEach(p=>{ if(d[p.id]!=null) s+=lvlById(d[p.id]).d20; });
+  return s>=DAY_MAX;
 }
+// النقاط = عدد الأيام الكاملة (١٠٠/١٠٠)
+function totalPoints(){ return Object.keys(DB.days).filter(k=> isPerfectDay(k)).length; }
 // يحسب السلسلة مع تطبيق حماية التجميد على الأيام الفائتة (يعدّل DB)
 function recomputeStreak(){
   let s=0; let d=new Date();
@@ -845,12 +888,20 @@ function renderPrayers(){
       <div class="note-row" data-note="${p.id}">
         ${noteFor(key,p.id) ? '<span class="note-txt">📝 '+esc(noteFor(key,p.id))+'</span>' : '<span class="note-add">📝 أضف ملاحظة</span>'}
       </div>
+      ${cur!=null ? activeBonusItems().map(bid=>{ const on=bonusFor(key,p.id,bid); const bd=BONUS_DEFS[bid];
+        return `<div class="bonus-row${on?' on':''}" data-bonus="${p.id}" data-bid="${bid}">
+          <span class="bonus-label">${on?'✓ ':'➕ '}${bd.label}</span>
+          <span class="bonus-pts">+5</span>
+        </div>`; }).join('') : ''}
       ${cur!=null ? `<button class="adhkar-btn" data-pname="${p.name}">📿 قراءة أذكار ما بعد الصلاة</button>` : ''}`;
     list.appendChild(card);
   });
   // bind
   list.querySelectorAll('.note-row').forEach(el=>{
     el.addEventListener('click',()=>editNote(key, el.dataset.note));
+  });
+  list.querySelectorAll('.bonus-row').forEach(el=>{
+    el.addEventListener('click',()=>toggleBonus(el.dataset.bonus, el.dataset.bid, el));
   });
   list.querySelectorAll('.adhkar-btn').forEach(el=>{
     el.addEventListener('click',()=>openAdhkar(el.dataset.pname));
@@ -872,19 +923,44 @@ function updateDaily(animate){
   const target=dayD20(ymd(viewDate));
   const ring=document.getElementById('dailyRing');
   const numEl=document.getElementById('dailyScore');
+  const card=document.getElementById('dailyCard');
+  const sub=document.getElementById('dailySub');
   const C=2*Math.PI*44;
   ring.style.strokeDasharray=C;
-  ring.style.strokeDashoffset=C*(1-target/DAY_MAX);
-  ring.style.stroke = target>=80?'#22c55e' : target>=50?'#eab308' : target>0?'#e67e22' : 'var(--gold-d)';
+  ring.style.strokeDashoffset=C*(1-Math.min(target,DAY_MAX)/DAY_MAX); // تعبئة كاملة عند ١٠٠+
+  const strong = target>DAY_MAX; // تجاوز المطلوب
+  card.classList.toggle('strong', strong);
+  if(strong){
+    ring.style.stroke='#e9c46a';
+    if(sub) sub.textContent='🌟 أداء استثنائي — تجاوزت المطلوب، أحسنت!';
+  }else{
+    ring.style.stroke = target>=DAY_MAX?'#22c55e' : target>=50?'#eab308' : target>0?'#e67e22' : 'var(--gold-d)';
+    if(sub) sub.textContent = target>=DAY_MAX ? '💎 يوم مثالي! أكملت ١٠٠ نقطة' : 'كل صلاة حتى ٢٠ نقطة + مكافآت إضافية ٥';
+  }
   if(animate){
     const from=displayedDaily, to=target, t0=performance.now(), dur=550;
     (function step(t){ const k=Math.min(1,(t-t0)/dur); numEl.textContent=Math.round(from+(to-from)*k); if(k<1) requestAnimationFrame(step); })(t0);
-    const card=document.getElementById('dailyCard');
     card.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:340,easing:'ease-out'});
   }else{
     numEl.textContent=target;
   }
   displayedDaily=target;
+}
+function toggleBonus(pid, bid, fromEl){
+  const key=ymd(viewDate);
+  if(!DB.days[key] || DB.days[key][pid]==null) return; // لازم الصلاة مسجّلة
+  if(!DB.days[key].bonus) DB.days[key].bonus={};
+  if(!DB.days[key].bonus[pid]) DB.days[key].bonus[pid]={};
+  const b=DB.days[key].bonus[pid];
+  const turningOn = !b[bid];
+  const rect = (turningOn && fromEl) ? fromEl.getBoundingClientRect() : null;
+  if(turningOn) b[bid]=true; else delete b[bid];
+  if(Object.keys(b).length===0) delete DB.days[key].bonus[pid];
+  save();
+  _flyingDaily = !!rect;
+  renderPrayers();
+  if(turningOn) toast('🌟 أحسنت! +٥ نقاط — '+BONUS_DEFS[bid].label);
+  if(rect) flyPoints(rect, BONUS_DEFS[bid].pts);
 }
 function flyPoints(rect, amount){
   const tgt=document.querySelector('.daily-ringwrap');
@@ -897,12 +973,14 @@ function flyPoints(rect, amount){
   chip.className='fly-pts'; chip.textContent='+'+amount;
   chip.style.left=fx+'px'; chip.style.top=fy+'px';
   document.body.appendChild(chip);
+  // حركة أبطأ وأوضح: يظهر الرقم كبيراً وثابتاً، يرتفع قليلاً، ثم يسير بهدوء للعدّاد
   const anim=chip.animate([
-    {transform:'translate(-50%,-50%) scale(.5)', opacity:0, offset:0},
-    {transform:'translate(-50%,-50%) scale(1.3)', opacity:1, offset:0.18},
-    {transform:`translate(calc(-50% + ${dx*0.55}px), calc(-50% + ${dy*0.55 - 46}px)) scale(1.1)`, opacity:1, offset:0.6},
-    {transform:`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.45)`, opacity:0.2, offset:1}
-  ], {duration:720, easing:'cubic-bezier(.45,0,.25,1)'});
+    {transform:'translate(-50%,-50%) scale(.6)', opacity:0, offset:0},
+    {transform:'translate(-50%,-50%) scale(1.35)', opacity:1, offset:0.15},
+    {transform:`translate(-50%, calc(-50% - 34px)) scale(1.35)`, opacity:1, offset:0.42},
+    {transform:`translate(calc(-50% + ${dx*0.6}px), calc(-50% + ${dy*0.6 - 30}px)) scale(1.2)`, opacity:1, offset:0.72},
+    {transform:`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.7)`, opacity:0, offset:1}
+  ], {duration:1300, easing:'cubic-bezier(.35,0,.25,1)'});
   anim.onfinish=()=>{ chip.remove(); _flyingDaily=false; updateDaily(true); };
   anim.oncancel=()=>{ chip.remove(); _flyingDaily=false; updateDaily(true); };
 }
@@ -948,7 +1026,7 @@ function setLevel(pid, lid, fromEl){
   // التقط موضع الخانة قبل إعادة الرسم (للحركة الطائرة)
   const rect = (selecting && fromEl) ? fromEl.getBoundingClientRect() : null;
   const amount = selecting ? lvlById(lid).d20 : 0;
-  if(!selecting){ delete DB.days[key][pid]; }
+  if(!selecting){ delete DB.days[key][pid]; if(DB.days[key].bonus) delete DB.days[key].bonus[pid]; }
   else { DB.days[key][pid]=lid; }
   save();
   _flyingDaily = !!rect; // امنع تحديث العدّاد فوراً حتى تصل الحركة
@@ -974,6 +1052,7 @@ function celebrateDay(key){
 /* ================= RENDER: SUMMARY ================= */
 let curRange='today';
 function renderSummary(){
+  renderHero(); // بطاقة الرتبة صارت أعلى صفحة الملخص
   const keys=rangeKeys(curRange);
   let score=0, cap=0, logged=0, first=0, missed=0;
   const lvlCounts={green:0,yellow:0,gray:0,oud:0,red:0};
@@ -1130,7 +1209,7 @@ function checkAchievements(){
   const res={
     first_day:anyComplete, perfect_day:perfect,
     streak3:st>=3, streak7:st>=7, streak30:st>=30,
-    first10:firstRow>=10, nomiss7:clean7, pts1000:tp>=1000
+    first10:firstRow>=10, nomiss7:clean7, perfect30:tp>=30
   };
   let newly=[];
   ACHIEVEMENTS.forEach(a=>{ if(res[a.id] && !DB.ach[a.id]){ DB.ach[a.id]=true; newly.push(a); } });
