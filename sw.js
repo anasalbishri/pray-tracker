@@ -1,6 +1,6 @@
 /* Service worker for متابعة الصلاة (Salah tracker PWA).
    Bump CACHE version whenever the app shell changes so clients update. */
-const CACHE = 'salah-tracker-v8';
+const CACHE = 'salah-tracker-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -65,4 +65,17 @@ self.addEventListener('fetch', (e) => {
 // Allow the page to trigger an immediate update.
 self.addEventListener('message', (e) => {
   if (e.data === 'skipWaiting') self.skipWaiting();
+});
+
+// Tapping a prayer reminder focuses an open window, or opens the app.
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ('focus' in c) return c.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow('./');
+    })
+  );
 });
