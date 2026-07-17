@@ -307,6 +307,18 @@
   .tool-btn{width:100%; margin-top:10px; padding:13px; border-radius:14px; border:1px solid var(--line); background:var(--card-solid); color:var(--txt); font-family:inherit; font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:10px; justify-content:flex-start;}
   .tool-btn .te{font-size:18px;}
   .tool-btn.gold{border-color:var(--gold-d); background:#7c4a1e22; color:var(--gold);}
+
+  /* settings */
+  .setting-row{display:flex; align-items:center; gap:12px; background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:14px;}
+  .setting-info{flex:1;}
+  .setting-title{font-size:15px; font-weight:800;}
+  .setting-sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.5;}
+  .switch{position:relative; display:inline-block; width:50px; height:28px; flex:none;}
+  .switch input{opacity:0; width:0; height:0;}
+  .switch .slider{position:absolute; inset:0; background:#0a2418; border:1px solid var(--line); border-radius:99px; transition:.25s; cursor:pointer;}
+  .switch .slider::before{content:""; position:absolute; height:20px; width:20px; right:3px; top:3px; background:var(--muted); border-radius:50%; transition:.25s;}
+  .switch input:checked + .slider{background:#16a34a55; border-color:var(--green-d);}
+  .switch input:checked + .slider::before{transform:translateX(-22px); background:#6ee7a0;}
 </style>
 </head>
 <body>
@@ -416,6 +428,15 @@
     <div class="sec-title"><span class="bar"></span> إنجازاتك</div>
     <div class="ach-grid" id="achGrid"></div>
 
+    <div class="sec-title"><span class="bar"></span> الإعدادات</div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-title">👩 وضع النساء</div>
+        <div class="setting-sub">٣ مستويات بدل ٥: بين الأذان والإقامة · في الوقت · فاتتني</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="femaleToggle"><span class="slider"></span></label>
+    </div>
+
     <div class="sec-title"><span class="bar"></span> أدوات</div>
     <button class="tool-btn gold" id="shareBtn"><span class="te">📤</span> شارك بطاقة إنجازك (صورة)</button>
     <button class="tool-btn" id="calBtn"><span class="te">📅</span> تذكيرات التقويم (٦٠ يوم)</button>
@@ -463,15 +484,25 @@ const PRAYERS = [
 ];
 
 // المستويات: الأعلى = الأفضل (face = الرمز التعبيري يظهر عند الاختيار)
-const LEVELS = [
+// مستويات الرجال (٥): تشمل صلاة الجماعة والصف الأول
+const LEVELS_STD = [
   {id:'green',  short:'قبل الإقامة', label:'قبل الإقامة', color:'#16a34a', pts:100, emoji:'🟢', face:'🌟'},
   {id:'yellow', short:'الركعة الأولى', label:'الركعة الأولى', color:'#eab308', pts:80,  emoji:'🟡', face:'🙂'},
   {id:'gray',   short:'في المسجد',   label:'في المسجد',   color:'#94a3b8', pts:60,  emoji:'⚪', face:'😐'},
   {id:'oud',    short:'في البيت',    label:'في البيت',    color:'#b06a2e', pts:30,  emoji:'🟤', face:'😕'},
   {id:'red',    short:'فاتتني',      label:'فاتتني',      color:'#dc2626', pts:0,   emoji:'🔴', face:'😞'},
 ];
+// مستويات النساء (٣): الصلاة في البيت — بين الأذان والإقامة / في الوقت / فاتتني
+const LEVELS_FEMALE = [
+  {id:'green',  short:'بين الأذان والإقامة', label:'بين الأذان والإقامة', color:'#16a34a', pts:100, emoji:'🟢', face:'🌟'},
+  {id:'yellow', short:'في الوقت', label:'في الوقت', color:'#eab308', pts:70, emoji:'🟡', face:'🙂'},
+  {id:'red',    short:'فاتتني',   label:'فاتتني',   color:'#dc2626', pts:0,  emoji:'🔴', face:'😞'},
+];
+let LEVELS = LEVELS_STD; // المجموعة الفعّالة (تتغيّر حسب الوضع)
+function applyMode(){ LEVELS = DB.female ? LEVELS_FEMALE : LEVELS_STD; }
 const MAX_DAY = PRAYERS.length * 100; // 500
-const lvlById = id => LEVELS.find(l=>l.id===id);
+// يبحث في المجموعة الفعّالة أولاً ثم في كل المجموعات (حتى تُحلّ أي بيانات قديمة)
+const lvlById = id => LEVELS.find(l=>l.id===id) || LEVELS_STD.find(l=>l.id===id) || LEVELS_FEMALE.find(l=>l.id===id);
 
 const RANKS = [
   {name:'مبتدئ',   emoji:'🌱', min:0,     sub:'ابدأ رحلتك في المحافظة على الصلاة'},
@@ -508,9 +539,11 @@ function load(){
   if(!d.city) d.city='jeddah';
   if(typeof d.freezes!=='number') d.freezes=1;      // تجميدة مجانية في البداية
   if(typeof d.freezeMilestone!=='number') d.freezeMilestone=0;
+  if(typeof d.female!=='boolean') d.female=false;   // وضع النساء (٣ مستويات)
   return d;
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(DB)); }
+applyMode(); // فعّل مجموعة المستويات حسب الوضع المحفوظ
 const MAX_FREEZES=3;
 
 /* ================= DATE HELPERS ================= */
@@ -771,7 +804,7 @@ function renderPrayers(){
         ${statusHtml}
       </div>
       ${due?'<div class="due-flag">⏰ دخل وقتها — سجّل صلاتك</div>':''}
-      <div class="levels">
+      <div class="levels" style="grid-template-columns:repeat(${LEVELS.length},1fr)">
         ${LEVELS.map(l=>`
           <div class="lvl${cur===l.id?' on':''}" style="--lc:${l.color}" data-p="${p.id}" data-l="${l.id}">
             <div class="dot" style="background:${l.color}"><span class="face">${l.face}</span></div>
@@ -846,9 +879,9 @@ function setLevel(pid, lid){
   // feedback
   const l=lvlById(lid);
   if(DB.days[key][pid]===lid){
-    if(lid==='green') toast('🟢 ما شاء الله! أدركت التكبيرة الأولى');
-    else if(lid==='yellow') toast('🟡 أحسنت، أدركت الركعة الأولى');
-    else if(lid==='red') toast('🔴 لا تيأس، الصلاة القادمة فرصة جديدة');
+    if(lid==='green') toast(DB.female?'🟢 ما شاء الله! صلّيتِ بين الأذان والإقامة':'🟢 ما شاء الله! أدركت التكبيرة الأولى');
+    else if(lid==='yellow') toast(DB.female?'🟡 أحسنتِ، صلّيتِ في الوقت':'🟡 أحسنت، أدركت الركعة الأولى');
+    else if(lid==='red') toast(DB.female?'🔴 لا تيأسي، الصلاة القادمة فرصة جديدة':'🔴 لا تيأس، الصلاة القادمة فرصة جديدة');
   }
   if(!wasComplete && isComplete(key)){ celebrateDay(key); }
   checkAchievements();
@@ -1062,9 +1095,19 @@ document.getElementById('prevDay').addEventListener('click',()=>{ viewDate.setDa
 document.getElementById('nextDay').addEventListener('click',()=>{ if(ymd(viewDate)!==ymd(new Date())){ viewDate.setDate(viewDate.getDate()+1); renderPrayers(); } });
 document.getElementById('resetBtn').addEventListener('click',()=>{
   if(confirm('هل تريد حذف كل بياناتك والبدء من جديد؟ لا يمكن التراجع.')){
-    DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:CITY.id}; save(); viewDate=new Date();
+    DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:CITY.id,female:DB.female}; save(); viewDate=new Date();
     renderPrayers(); renderHero(); renderAch(); toast('تم حذف البيانات');
   }
+});
+
+/* ================= وضع النساء ================= */
+const femaleToggle=document.getElementById('femaleToggle');
+femaleToggle.checked=DB.female;
+femaleToggle.addEventListener('change',()=>{
+  DB.female=femaleToggle.checked; save(); applyMode();
+  renderPrayers(); renderHero();
+  if(document.getElementById('page-summary').classList.contains('active')) renderSummary();
+  toast(DB.female?'👩 تم تفعيل وضع النساء (٣ مستويات)':'تم الرجوع للوضع العادي (٥ مستويات)');
 });
 
 /* ================= CITY PICKER ================= */
