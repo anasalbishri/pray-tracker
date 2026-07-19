@@ -254,10 +254,14 @@
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
-  .day-nav{display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;}
-  .day-nav button{width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:var(--card-solid); color:var(--txt); font-size:16px; cursor:pointer;}
+  .day-nav{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; position:relative;}
+  .day-nav button{width:38px; height:38px; border-radius:11px; border:1px solid var(--line); background:var(--card-solid); color:var(--txt); font-size:18px; font-weight:800; cursor:pointer; font-family:inherit; display:grid; place-items:center;}
+  .day-nav button:active{transform:scale(.92);}
   .day-nav button:disabled{opacity:.3;}
-  .day-nav .dlabel{font-size:13px; font-weight:700; min-width:120px; text-align:center;}
+  .day-nav .dlabel{width:auto; height:38px; min-width:150px; padding:0 14px; font-size:13.5px; font-weight:800; color:var(--gold); border-color:var(--gold-d); background:#7c4a1e22;}
+  .day-nav #datePick{position:absolute; inset:0; margin:auto; width:1px; height:1px; opacity:0; pointer-events:none; border:0;}
+  .back-today{display:block; margin:10px auto 0; padding:8px 16px; border-radius:99px; border:1px solid var(--line); background:var(--card-solid); color:var(--muted); font-family:inherit; font-weight:700; font-size:12.5px; cursor:pointer;}
+  .back-today:active{transform:scale(.97);}
 
   .reset-btn{width:100%; margin-top:18px; padding:12px; border-radius:14px; border:1px solid var(--red-d); background:transparent; color:#ef8a8a; font-family:inherit; font-weight:700; font-size:13px; cursor:pointer;}
 
@@ -349,11 +353,11 @@
   .insight b{color:var(--gold);}
 
   /* heatmap */
-  .heat{background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:16px; overflow-x:auto;}
-  .heat-row{display:flex; align-items:center; gap:8px; margin:5px 0;}
-  .heat-row .hn{width:70px; font-size:12px; color:var(--muted); flex:none; display:flex; align-items:center; gap:4px;}
-  .heat-cells{display:flex; gap:3px;}
-  .heat-cell{width:13px; height:13px; border-radius:3px; background:#0a2418; border:1px solid #ffffff0a; flex:none;}
+  .heat{background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:16px; overflow-x:auto;}
+  .heat-row{display:flex; align-items:center; gap:10px; margin:7px 0;}
+  .heat-row .hn{width:84px; font-size:13px; color:var(--muted); flex:none; display:flex; align-items:center; gap:5px;}
+  .heat-cells{display:flex; gap:5px;}
+  .heat-cell{width:20px; height:20px; border-radius:5px; background:#0a2418; border:1px solid #ffffff0a; flex:none;}
   .heat-legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;}
   .heat-legend span{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; color:var(--muted);}
   .heat-legend i{width:10px; height:10px; border-radius:2px; display:inline-block;}
@@ -412,10 +416,12 @@
     </div>
 
     <div class="day-nav">
-      <button id="prevDay">‹</button>
-      <div class="dlabel" id="dayLabel">اليوم</div>
-      <button id="nextDay">›</button>
+      <button id="prevDay" aria-label="اليوم السابق">›</button>
+      <button class="dlabel" id="dayLabel" aria-label="اختر تاريخاً">📅 اليوم</button>
+      <button id="nextDay" aria-label="اليوم التالي">‹</button>
+      <input type="date" id="datePick" aria-hidden="true">
     </div>
+    <button id="backToday" class="back-today" style="display:none">⟳ العودة لليوم</button>
 
     <div class="sec-title"><span class="bar"></span> صلوات اليوم</div>
     <div id="prayerList"></div>
@@ -994,8 +1000,9 @@ function renderPrayers(){
     el.addEventListener('click',()=>setLevel(el.dataset.p, el.dataset.l, el));
   });
   // day label
-  document.getElementById('dayLabel').textContent = isToday? 'اليوم' : (AR_DAYS[viewDate.getDay()]+' '+viewDate.getDate()+' '+AR_MONTHS[viewDate.getMonth()]);
+  document.getElementById('dayLabel').textContent = '📅 '+(isToday? 'اليوم' : (AR_DAYS[viewDate.getDay()]+' '+viewDate.getDate()+' '+AR_MONTHS[viewDate.getMonth()]));
   document.getElementById('nextDay').disabled = isToday;
+  document.getElementById('backToday').style.display = isToday ? 'none' : 'block';
   renderTimes();
   renderNextPrayer();
   if(!_flyingDaily) updateDaily(false);
@@ -1347,8 +1354,25 @@ document.querySelectorAll('.range-tabs button').forEach(b=> b.addEventListener('
   document.querySelectorAll('.range-tabs button').forEach(x=>x.classList.toggle('on',x===b));
   renderSummary();
 }));
-document.getElementById('prevDay').addEventListener('click',()=>{ viewDate.setDate(viewDate.getDate()-1); renderPrayers(); });
-document.getElementById('nextDay').addEventListener('click',()=>{ if(ymd(viewDate)!==ymd(new Date())){ viewDate.setDate(viewDate.getDate()+1); renderPrayers(); } });
+document.getElementById('prevDay').addEventListener('click',()=>{ viewDate.setDate(viewDate.getDate()-1); renderPrayers(); window.scrollTo(0,0); });
+document.getElementById('nextDay').addEventListener('click',()=>{ if(ymd(viewDate)!==ymd(new Date())){ viewDate.setDate(viewDate.getDate()+1); renderPrayers(); window.scrollTo(0,0); } });
+document.getElementById('backToday').addEventListener('click',()=>{ viewDate=new Date(); renderPrayers(); window.scrollTo(0,0); });
+// اختيار أي يوم سابق مباشرةً من التقويم
+const datePick=document.getElementById('datePick');
+document.getElementById('dayLabel').addEventListener('click',()=>{
+  datePick.max=ymd(new Date());
+  datePick.value=ymd(viewDate);
+  if(datePick.showPicker){ try{ datePick.showPicker(); return; }catch(e){} }
+  datePick.click();
+});
+datePick.addEventListener('change',()=>{
+  if(!datePick.value) return;
+  const [y,m,d]=datePick.value.split('-').map(Number);
+  const picked=new Date(y,m-1,d); picked.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  if(picked>today) return;           // لا يُسمح بالمستقبل
+  viewDate=picked; renderPrayers(); window.scrollTo(0,0);
+});
 document.getElementById('resetBtn').addEventListener('click',()=>{
   if(confirm('هل تريد حذف كل بياناتك والبدء من جديد؟ لا يمكن التراجع.')){
     DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:CITY.id,female:DB.female}; save(); viewDate=new Date();
