@@ -426,11 +426,13 @@
     <div class="sec-title"><span class="bar"></span> صلوات اليوم</div>
     <div id="prayerList"></div>
 
-    <div class="sec-title" style="justify-content:space-between">
-      <span style="display:flex;align-items:center;gap:8px"><span class="bar"></span> أوقات الصلاة — <span id="cityName">جدة</span></span>
-      <button id="cityBtn" class="city-chip">📍 تغيير المدينة</button>
+    <div id="timesSection">
+      <div class="sec-title" style="justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:8px"><span class="bar"></span> أوقات الصلاة — <span id="cityName">جدة</span></span>
+        <button id="cityBtn" class="city-chip">📍 تغيير المدينة</button>
+      </div>
+      <div class="times-card" id="timesCard"></div>
     </div>
-    <div class="times-card" id="timesCard"></div>
   </div>
 
   <!-- ===================== SUMMARY ===================== -->
@@ -468,8 +470,8 @@
     </div>
 
     <div class="range-tabs">
-      <button data-range="today" class="on">اليوم</button>
-      <button data-range="week">الأسبوع</button>
+      <button data-range="today">اليوم</button>
+      <button data-range="week" class="on">الأسبوع</button>
       <button data-range="month">الشهر</button>
     </div>
 
@@ -510,6 +512,14 @@
         <div class="setting-sub">٣ مستويات بدل ٥: بين الأذان والإقامة · في الوقت · فاتتني</div>
       </div>
       <label class="switch"><input type="checkbox" id="femaleToggle"><span class="slider"></span></label>
+    </div>
+
+    <div class="setting-row" style="margin-top:12px">
+      <div class="setting-info">
+        <div class="setting-title">🕰️ إخفاء أوقات الصلاة</div>
+        <div class="setting-sub">إخفاء قسم «أوقات الصلاة» من الصفحة الرئيسية لمن لا يحتاجه</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="hideTimesToggle"><span class="slider"></span></label>
     </div>
 
     <div class="sec-title"><span class="bar"></span> التذكير والإشعارات</div>
@@ -622,6 +632,7 @@ function load(){
   if(typeof d.freezes!=='number') d.freezes=1;      // تجميدة مجانية في البداية
   if(typeof d.freezeMilestone!=='number') d.freezeMilestone=0;
   if(typeof d.female!=='boolean') d.female=false;   // وضع النساء (٣ مستويات)
+  if(typeof d.hideTimes!=='boolean') d.hideTimes=false; // إخفاء أوقات الصلاة
   return d;
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(DB)); }
@@ -1154,7 +1165,7 @@ function celebrateDay(key){
 }
 
 /* ================= RENDER: SUMMARY ================= */
-let curRange='today';
+let curRange='week';
 function renderSummary(){
   renderHero(); // بطاقة الرتبة صارت أعلى صفحة الملخص
   renderChallenges();
@@ -1375,9 +1386,18 @@ datePick.addEventListener('change',()=>{
 });
 document.getElementById('resetBtn').addEventListener('click',()=>{
   if(confirm('هل تريد حذف كل بياناتك والبدء من جديد؟ لا يمكن التراجع.')){
-    DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:CITY.id,female:DB.female}; save(); viewDate=new Date();
-    renderPrayers(); renderHero(); renderAch(); toast('تم حذف البيانات');
+    DB={days:{},ach:{},notes:{},frozenDays:{},chDone:{},freezes:1,freezeMilestone:0,city:CITY.id,female:DB.female,hideTimes:DB.hideTimes}; save(); viewDate=new Date();
+    renderPrayers(); renderHero(); renderAch(); applyHideTimes(); toast('تم حذف البيانات');
   }
+});
+
+/* ================= إخفاء أوقات الصلاة ================= */
+function applyHideTimes(){ const el=document.getElementById('timesSection'); if(el) el.style.display = DB.hideTimes ? 'none' : ''; }
+const hideTimesToggle=document.getElementById('hideTimesToggle');
+hideTimesToggle.checked=DB.hideTimes;
+hideTimesToggle.addEventListener('change',()=>{
+  DB.hideTimes=hideTimesToggle.checked; save(); applyHideTimes();
+  toast(DB.hideTimes?'🕰️ تم إخفاء أوقات الصلاة':'🕰️ تم إظهار أوقات الصلاة');
 });
 
 /* ================= وضع النساء ================= */
@@ -1491,8 +1511,9 @@ document.getElementById('importFile').addEventListener('change',e=>{
       const obj=JSON.parse(r.result);
       if(!obj.days) throw new Error('ملف غير صالح');
       if(!confirm('سيتم استبدال بياناتك الحالية ببيانات الملف. متابعة؟')) return;
-      DB=Object.assign({days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:'jeddah'}, obj);
-      save(); viewDate=new Date(); setCity(DB.city); updateCityName();
+      DB=Object.assign({days:{},ach:{},notes:{},frozenDays:{},chDone:{},freezes:1,freezeMilestone:0,city:'jeddah',female:false,hideTimes:false}, obj);
+      save(); viewDate=new Date(); setCity(DB.city); updateCityName(); applyMode();
+      femaleToggle.checked=DB.female; hideTimesToggle.checked=DB.hideTimes; applyHideTimes();
       renderPrayers(); renderHero(); renderAch(); toast('📥 تم استيراد البيانات بنجاح');
     }catch(err){ toast('تعذّر قراءة الملف — تأكد أنه نسخة صحيحة'); }
   };
@@ -1643,6 +1664,7 @@ async function scheduleReminders(){
 /* ================= INIT ================= */
 document.getElementById('hijriDate').textContent=hijri(new Date());
 updateCityName();
+applyHideTimes();
 updateNotifBtn();
 renderHero(); renderPrayers(); renderAch();
 reminderCheck();
