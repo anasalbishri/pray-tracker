@@ -168,6 +168,19 @@
   .stat b{font-size:26px; display:block; line-height:1;}
   .stat span{font-size:12px; color:var(--muted); margin-top:6px; display:block;}
 
+  /* ===== Weekly challenges ===== */
+  .ch-week{font-size:11.5px; color:var(--muted); margin:-4px 2px 12px;}
+  .challenge{background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:10px; transition:.3s;}
+  .challenge.done{border-color:var(--gold-d); box-shadow:0 8px 20px -14px var(--gold);}
+  .ch-top{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .ch-ico{font-size:22px; flex:none;}
+  .ch-title{font-size:14px; font-weight:800; flex:1;}
+  .ch-val{font-size:13px; font-weight:800; color:var(--gold); direction:ltr; unicode-bidi:isolate; flex:none;}
+  .challenge.done .ch-val{color:#6ee7a0;}
+  .ch-track{height:10px; background:#0a2418; border-radius:99px; overflow:hidden; border:1px solid #0006;}
+  .ch-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold-d),var(--gold)); transition:width .6s cubic-bezier(.2,.8,.2,1); width:0;}
+  .challenge.done .ch-fill{background:linear-gradient(90deg,var(--green-d),#22c55e);}
+
   .feedback{
     border-radius:18px; padding:16px; margin-bottom:16px;
     border:1px solid var(--line); text-align:center;
@@ -436,6 +449,10 @@
       </div>
     </div>
 
+    <div class="sec-title"><span class="bar"></span> 🎯 تحديات الأسبوع</div>
+    <div class="ch-week" id="chWeek"></div>
+    <div id="challengesCard"></div>
+
     <div class="sec-title"><span class="bar"></span> ملخص أدائك</div>
 
     <div class="feedback" id="feedbackBox">
@@ -594,6 +611,7 @@ function load(){
   if(!d.ach) d.ach={};
   if(!d.notes) d.notes={};
   if(!d.frozenDays) d.frozenDays={};
+  if(!d.chDone) d.chDone={};
   if(!d.city) d.city='jeddah';
   if(typeof d.freezes!=='number') d.freezes=1;      // تجميدة مجانية في البداية
   if(typeof d.freezeMilestone!=='number') d.freezeMilestone=0;
@@ -836,6 +854,47 @@ function rangeKeys(range){
   return keys;
 }
 
+/* ================= WEEKLY CHALLENGES ================= */
+// أيام الأسبوع الحالي من الأحد حتى اليوم
+function weekKeys(){ const keys=[]; const t=new Date(); const dow=t.getDay(); for(let i=0;i<=dow;i++){ const d=new Date(t); d.setDate(t.getDate()-i); keys.push(ymd(d)); } return keys; }
+function weekStartKey(){ const t=new Date(); const d=new Date(t); d.setDate(t.getDate()-t.getDay()); return ymd(d); }
+const CHALLENGES=[
+  {id:'fajr7', icon:'🌄', title:'المحافظة على الفجر', target:7, unit:'أيام',
+    calc:keys=>keys.reduce((a,k)=>{ const v=(DB.days[k]||{}).fajr; return a+((v!=null&&v!=='red')?1:0); },0)},
+  {id:'saff', icon:'⭐', title:'الصف الأول (قبل الإقامة)', target:15, unit:'صلاة',
+    calc:keys=>keys.reduce((a,k)=>{ const dd=DB.days[k]||{}; return a+PRAYERS.filter(p=>dd[p.id]==='green').length; },0)},
+  {id:'clean', icon:'✅', title:'أيام بلا فوات', target:5, unit:'أيام',
+    calc:keys=>keys.filter(k=>isCleanDay(k)).length},
+  {id:'perfect', icon:'💎', title:'أيام مثالية (١٠٠/١٠٠)', target:3, unit:'أيام',
+    calc:keys=>keys.filter(k=>isPerfectDay(k)).length},
+];
+function renderChallenges(){
+  const el=document.getElementById('challengesCard'); if(!el) return;
+  const keys=weekKeys();
+  const w=document.getElementById('chWeek');
+  if(w){ const start=keys[keys.length-1].split('-'); w.textContent='من '+(+start[2])+' '+AR_MONTHS[+start[1]-1]+' — يتجدّد كل أحد'; }
+  el.innerHTML=CHALLENGES.map(c=>{
+    const cur=Math.min(c.calc(keys), c.target);
+    const done=cur>=c.target; const pct=Math.round(cur/c.target*100);
+    return `<div class="challenge${done?' done':''}">
+      <div class="ch-top">
+        <span class="ch-ico">${done?'🏆':c.icon}</span>
+        <span class="ch-title">${c.title}</span>
+        <span class="ch-val">${done?'✓ ':''}${cur} / ${c.target} ${c.unit}</span>
+      </div>
+      <div class="ch-track"><div class="ch-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+// إشعار عند إنجاز تحدٍّ جديد (مرة واحدة لكل أسبوع)
+function checkChallenges(){
+  const keys=weekKeys(); const wk=weekStartKey();
+  if(!DB.chDone[wk]) DB.chDone[wk]={};
+  let changed=false;
+  CHALLENGES.forEach(c=>{ if(c.calc(keys)>=c.target && !DB.chDone[wk][c.id]){ DB.chDone[wk][c.id]=true; changed=true; toast('🏆 أنجزت تحدي الأسبوع: '+c.title); } });
+  if(changed) save();
+}
+
 /* ================= RENDER: TODAY ================= */
 // توسيع/طيّ الصلوات يدوياً (pid -> true/false)، يُصفّر عند تغيّر اليوم المعروض
 let uiExpand={}, uiExpandKey=null;
@@ -883,6 +942,7 @@ function renderPrayers(){
     const collapsed = collapsible && (uiExpand[p.id]!==undefined ? !uiExpand[p.id] : true);
     const card=document.createElement('div');
     card.className='prayer'+(cur!=null?' done':'')+(due?' due':'')+(collapsed?' collapsed':'');
+    card.dataset.pid=p.id;
     if(cur!=null) card.style.setProperty('--pc', lvlById(cur).color);
     let statusHtml='<div class="p-status">لم تُسجّل</div>';
     if(cur!=null){ const l=lvlById(cur); statusHtml=`<div class="p-status set" style="background:${l.color}">${l.face} ${l.label}</div>`; }
@@ -919,7 +979,7 @@ function renderPrayers(){
   });
   // bind
   list.querySelectorAll('.p-toggle').forEach(el=>{
-    el.addEventListener('click',()=>{ const pid=el.dataset.toggle; uiExpand[pid]=(uiExpand[pid]===undefined?true:!uiExpand[pid]); renderPrayers(); });
+    el.addEventListener('click',()=>{ const pid=el.dataset.toggle; uiExpand[pid]=(uiExpand[pid]===undefined?true:!uiExpand[pid]); anchoredRender(pid); });
   });
   list.querySelectorAll('.note-row').forEach(el=>{
     el.addEventListener('click',()=>editNote(key, el.dataset.note));
@@ -939,6 +999,17 @@ function renderPrayers(){
   renderTimes();
   renderNextPrayer();
   if(!_flyingDaily) updateDaily(false);
+}
+
+// إعادة رسم الصلوات مع تثبيت موضع صلاة معيّنة بصرياً (حتى لا تقفز عند طيّ ما فوقها)
+function anchoredRender(pid){
+  const oldCard = pid ? document.querySelector('.prayer[data-pid="'+pid+'"]') : null;
+  const oldTop = oldCard ? oldCard.getBoundingClientRect().top : null;
+  renderPrayers();
+  if(oldTop!=null){
+    const nc = document.querySelector('.prayer[data-pid="'+pid+'"]');
+    if(nc){ const delta = nc.getBoundingClientRect().top - oldTop; if(Math.abs(delta)>0.5) window.scrollBy(0, delta); }
+  }
 }
 
 /* ================= DAILY COUNTER (out of 100) ================= */
@@ -982,7 +1053,7 @@ function toggleBonus(pid, bid, fromEl){
   if(Object.keys(b).length===0) delete DB.days[key].bonus[pid];
   save();
   _flyingDaily = !!rect;
-  renderPrayers();
+  anchoredRender(pid);
   if(turningOn) toast('🌟 أحسنت! +٥ نقاط — '+BONUS_DEFS[bid].label);
   if(rect) flyPoints(rect, BONUS_DEFS[bid].pts);
 }
@@ -1055,7 +1126,7 @@ function setLevel(pid, lid, fromEl){
   else { DB.days[key][pid]=lid; buzz(18); }
   save();
   _flyingDaily = !!rect; // امنع تحديث العدّاد فوراً حتى تصل الحركة
-  renderPrayers(); renderHero();
+  anchoredRender(pid); renderHero(); // ثبّت موضع الصلاة المسجّلة حتى لا تقفز
   // feedback
   if(selecting){
     if(lid==='green') toast(DB.female?'🟢 ما شاء الله! صلّيتِ بين الأذان والإقامة':'🟢 ما شاء الله! أدركت التكبيرة الأولى');
@@ -1065,6 +1136,7 @@ function setLevel(pid, lid, fromEl){
   if(rect) flyPoints(rect, amount);
   if(!wasComplete && isComplete(key)){ celebrateDay(key); }
   checkAchievements();
+  checkChallenges();
 }
 
 function celebrateDay(key){
@@ -1078,6 +1150,7 @@ function celebrateDay(key){
 let curRange='today';
 function renderSummary(){
   renderHero(); // بطاقة الرتبة صارت أعلى صفحة الملخص
+  renderChallenges();
   const keys=rangeKeys(curRange);
   let score=0, cap=0, logged=0, first=0, missed=0;
   const lvlCounts={green:0,yellow:0,gray:0,oud:0,red:0};
