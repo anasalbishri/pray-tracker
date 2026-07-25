@@ -104,6 +104,9 @@
   .bonus-row.on{border-style:solid; border-color:var(--green-d); background:#16a34a1a; color:#6ee7a0;}
   .bonus-pts{font-weight:900; background:#0a2418; border:1px solid var(--gold-d); border-radius:99px; padding:3px 11px; direction:ltr; unicode-bidi:isolate;}
   .bonus-row.on .bonus-pts{color:#6ee7a0; border-color:var(--green-d);}
+  .friday-card{background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--gold-d); border-radius:16px; padding:12px;}
+  .friday-card .bonus-row{margin-top:0; margin-bottom:8px;}
+  .friday-card .bonus-row:last-child{margin-bottom:0;}
   .fly-pts{position:fixed; z-index:300; font-weight:900; font-size:30px; color:var(--gold); text-shadow:0 2px 12px #000e, 0 0 18px #e9c46a88; pointer-events:none; will-change:transform,opacity;}
 
   .streak-chip{
@@ -419,6 +422,8 @@
 
     <div class="sec-title"><span class="bar"></span> صلوات اليوم</div>
     <div id="prayerList"></div>
+
+    <div id="fridayWrap"></div>
 
     <div class="sec-title" style="justify-content:space-between">
       <span style="display:flex;align-items:center;gap:8px"><span class="bar"></span> أوقات الصلاة — <span id="cityName">جدة</span></span>
@@ -769,6 +774,18 @@ const BONUS_DEFS = {
 // المكافآت المعروضة حسب الوضع (الجماعة تخص الرجال)
 function activeBonusItems(){ return DB.female ? ['sunnah'] : ['saff','walk']; }
 function bonusFor(key,pid,bid){ const d=DB.days[key]; return !!(d && d.bonus && d.bonus[pid] && d.bonus[pid][bid]); }
+// ===== سنن يوم الجمعة =====
+const FRIDAY_TASKS = [
+  {id:'kahf',    label:'📖 قراءة سورة الكهف',         pts:5},
+  {id:'salawat', label:'🤲 الصلاة على النبي ١٠٠ مرة',  pts:5},
+  {id:'walkjum', label:'🚶 المشي للمسجد',             pts:5},
+  {id:'ghusl',   label:'🚿 الاغتسال',                 pts:2},
+  {id:'nails',   label:'✂️ قص الأظافر',               pts:2},
+  {id:'perfume', label:'🌸 التطيب',                   pts:2},
+];
+function isFridayKey(key){ const p=key.split('-'); return new Date(+p[0],+p[1]-1,+p[2]).getDay()===5; }
+// اسم الصلاة: الظهر يصبح "صلاة الجمعة" يوم الجمعة
+function displayName(p, date){ return (p.id==='dhuhr' && date.getDay()===5) ? 'صلاة الجمعة' : p.name; }
 function dayD20(key){
   const d=dayData(key); let s=0;
   PRAYERS.forEach(p=>{ if(d[p.id]!=null){
@@ -776,6 +793,7 @@ function dayD20(key){
     const b=d.bonus&&d.bonus[p.id];
     if(b){ for(const k in b){ if(b[k]&&BONUS_DEFS[k]) s+=BONUS_DEFS[k].pts; } }
   }});
+  if(isFridayKey(key) && d.friday){ FRIDAY_TASKS.forEach(t=>{ if(d.friday[t.id]) s+=t.pts; }); }
   return s;
 }
 function isCleanDay(key){ // كل الصلوات مسجلة ولا يوجد فائتة
@@ -966,12 +984,12 @@ function renderPrayers(){
             <span class="bonus-label">${on?'✓ ':'➕ '}${bd.label}</span>
             <span class="bonus-pts">+5</span>
           </div>`; }).join('') : ''}
-        ${cur!=null ? `<button class="adhkar-btn" data-pname="${p.name}">📿 قراءة أذكار ما بعد الصلاة</button>` : ''}
+        ${cur!=null ? `<button class="adhkar-btn" data-pname="${displayName(p,viewDate)}">📿 قراءة أذكار ما بعد الصلاة</button>` : ''}
       </div>`;
     card.innerHTML=`
       <div class="p-head">
         <div class="p-icon">${p.icon}</div>
-        <div class="p-name">${p.name}</div>
+        <div class="p-name">${displayName(p,viewDate)}</div>
         <div class="p-time">${fmtTime(ptime)}</div>
         ${statusHtml}
         ${toggleHtml}
@@ -997,9 +1015,43 @@ function renderPrayers(){
   // day label
   document.getElementById('dayLabel').textContent = isToday? 'اليوم' : (AR_DAYS[viewDate.getDay()]+' '+viewDate.getDate()+' '+AR_MONTHS[viewDate.getMonth()]);
   document.getElementById('nextDay').disabled = isToday;
+  renderFriday();
   renderTimes();
   renderNextPrayer();
   if(!_flyingDaily) updateDaily(false);
+}
+
+/* ================= سنن يوم الجمعة ================= */
+function renderFriday(){
+  const wrap=document.getElementById('fridayWrap'); if(!wrap) return;
+  if(viewDate.getDay()!==5){ wrap.innerHTML=''; return; }
+  const key=ymd(viewDate);
+  const fd=(DB.days[key]&&DB.days[key].friday)||{};
+  const done=FRIDAY_TASKS.filter(t=>fd[t.id]).length, total=FRIDAY_TASKS.length;
+  const rows=FRIDAY_TASKS.map(t=>{ const on=!!fd[t.id];
+    return `<div class="bonus-row${on?' on':''}" data-fri="${t.id}">
+      <span class="bonus-label">${on?'✓ ':'➕ '}${t.label}</span>
+      <span class="bonus-pts">+${t.pts}</span>
+    </div>`; }).join('');
+  wrap.innerHTML=`<div class="sec-title"><span class="bar"></span> 🕌 سنن يوم الجمعة <span style="color:var(--muted);font-weight:600;font-size:12px">(${done}/${total})</span></div>
+    <div class="friday-card">${rows}</div>`;
+  wrap.querySelectorAll('.bonus-row').forEach(el=> el.addEventListener('click',()=>toggleFriday(el.dataset.fri, el)));
+}
+function toggleFriday(tid, fromEl){
+  const key=ymd(viewDate);
+  if(!DB.days[key]) DB.days[key]={};
+  if(!DB.days[key].friday) DB.days[key].friday={};
+  const f=DB.days[key].friday;
+  const turningOn=!f[tid];
+  const rect=(turningOn&&fromEl)?fromEl.getBoundingClientRect():null;
+  if(turningOn) f[tid]=true; else delete f[tid];
+  if(Object.keys(f).length===0) delete DB.days[key].friday;
+  save();
+  _flyingDaily=!!rect;
+  renderPrayers(); renderHero();
+  const t=FRIDAY_TASKS.find(x=>x.id===tid);
+  if(turningOn) toast('🌟 أحسنت! +'+t.pts+' — '+t.label);
+  if(rect) flyPoints(rect, t.pts);
 }
 
 // إعادة رسم الصلوات مع تثبيت موضع صلاة معيّنة بصرياً (حتى لا تقفز عند طيّ ما فوقها)
@@ -1084,23 +1136,26 @@ function flyPoints(rect, amount){
 
 /* ================= PRAYER TIMES UI ================= */
 function renderTimes(){
-  const times=prayerTimesFor(new Date());
+  const now=new Date();
+  const times=prayerTimesFor(now);
   const nh=nowHours();
+  const isFri=now.getDay()===5;
   // أي وقت نحن فيه الآن (آخر وقت مضى)
   let currentKey=null;
   TIME_KEYS.forEach(t=>{ if(nh>=times[t.key]) currentKey=t.key; });
-  document.getElementById('timesCard').innerHTML = TIME_KEYS.map(t=>`
-    <div class="trow${t.key===currentKey?' now':''}">
-      <div class="tn"><span>${t.icon}</span><span>${t.name}</span></div>
+  document.getElementById('timesCard').innerHTML = TIME_KEYS.map(t=>{
+    const nm = (t.key==='dhuhr' && isFri) ? 'صلاة الجمعة' : t.name;
+    return `<div class="trow${t.key===currentKey?' now':''}">
+      <div class="tn"><span>${t.icon}</span><span>${nm}</span></div>
       <div>${fmtTime(times[t.key])}</div>
-    </div>`).join('');
+    </div>`; }).join('');
 }
 function renderNextPrayer(){
   const now=new Date();
   const times=prayerTimesFor(now);
   const nh=nowHours();
   // الصلوات الخمس فقط (بدون الشروق)
-  const seq=PRAYERS.map(p=>({name:p.name, icon:p.icon, t:times[p.id]}));
+  const seq=PRAYERS.map(p=>({name:displayName(p,now), icon:p.icon, t:times[p.id]}));
   let next=seq.find(s=>s.t>nh);
   let label='الصلاة القادمة';
   if(!next){ // بعد العشاء → فجر الغد
