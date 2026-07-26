@@ -264,7 +264,7 @@
     border:0; background:transparent; color:var(--muted);
     font-family:inherit; font-size:11px; font-weight:700;
     display:flex; flex-direction:column; align-items:center; gap:3px;
-    padding:6px 14px; border-radius:12px; cursor:pointer; transition:.2s;
+    padding:6px 10px; border-radius:12px; cursor:pointer; transition:.2s;
   }
   nav button .ni{font-size:20px;}
   nav button.on{color:var(--gold);}
@@ -341,6 +341,7 @@
 
   .adhkar-btn{width:100%; margin-top:10px; padding:11px; border-radius:12px; border:1px solid var(--gold-d); background:#7c4a1e22; color:var(--gold); font-family:inherit; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;}
   .adhkar-btn:active{transform:scale(.98);}
+  .adhkar-btn.done{border-color:var(--green-d); background:#16a34a1a; color:#6ee7a0;}
   /* dhikr cards inside modal */
   .dhikr{background:var(--inner2); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:10px; cursor:pointer; transition:.12s; -webkit-user-select:none; user-select:none;}
   .dhikr:active{transform:scale(.99);}
@@ -397,6 +398,35 @@
   .dhikr-edit .de-text{flex:1; font-size:13px; line-height:1.6;}
   .dhikr-edit .de-count{font-size:12px; font-weight:800; color:var(--gold); background:var(--inner); border:1px solid var(--gold-d); border-radius:99px; padding:3px 9px; direction:ltr; unicode-bidi:isolate; flex:none;}
   .dhikr-edit .de-del{width:30px; height:30px; border-radius:9px; border:1px solid var(--red-d); background:transparent; color:#ef8a8a; font-size:14px; cursor:pointer; flex:none;}
+  .dhikr-edit .de-reorder{display:flex; flex-direction:column; gap:2px; flex:none;}
+  .dhikr-edit .de-mv{width:26px; height:18px; border-radius:6px; border:1px solid var(--line); background:var(--inner); color:var(--gold); font-size:9px; cursor:pointer; line-height:1; padding:0;}
+  .dhikr-edit .de-mv:disabled{opacity:.3;}
+
+  /* tasbeeh page */
+  .tasbeeh-card{background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--line); border-radius:22px; padding:18px; text-align:center;}
+  .tb-dhikr{font-size:22px; font-weight:800; color:var(--gold); line-height:1.7;}
+  .tb-virtue{font-size:12.5px; color:var(--muted); margin-top:6px; line-height:1.7; min-height:18px;}
+  .tb-counter{margin:16px auto 0; width:180px; height:180px; border-radius:50%; border:3px solid var(--gold-d); background:var(--inner); color:var(--txt); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; transition:transform .08s; box-shadow:0 10px 30px -14px #000a, inset 0 2px 0 #ffffff10;}
+  .tb-counter:active{transform:scale(.95);}
+  .tb-counter b{font-size:52px; line-height:1; color:var(--gold);}
+  .tb-counter span{font-size:12px; color:var(--muted);}
+  .tb-controls{display:flex; align-items:center; justify-content:space-between; margin-top:16px;}
+  .tb-reset{border:1px solid var(--line); background:var(--card-solid); color:var(--txt); font-family:inherit; font-weight:700; font-size:13px; padding:9px 16px; border-radius:12px; cursor:pointer;}
+  .tb-total{font-size:13px; color:var(--muted);} .tb-total b{color:var(--gold);}
+  .tb-item{background:var(--card-solid); border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-bottom:8px; cursor:pointer; transition:.15s;}
+  .tb-item.sel{border-color:var(--gold-d); background:#7c4a1e18;}
+  .tb-item .tbi-dhikr{font-size:15px; font-weight:800; color:var(--txt);}
+  .tb-item .tbi-virtue{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.6;}
+
+  /* garden page */
+  .garden-card{background:linear-gradient(180deg,#0e3a2a,#0c3223); border:1px solid var(--line); border-radius:22px; padding:16px; overflow:hidden;}
+  .garden-card svg{width:100%; height:auto; display:block; border-radius:14px;}
+  .garden-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
+  .garden-stat{background:var(--card-solid); border:1px solid var(--line); border-radius:14px; padding:12px; text-align:center;}
+  .garden-stat b{font-size:22px; display:block; color:var(--gold);}
+  .garden-stat span{font-size:11px; color:var(--muted); margin-top:4px; display:block;}
+  .garden-msg{text-align:center; font-size:14px; font-weight:800; margin-top:14px; color:#6ee7a0;}
+  .garden-stage{text-align:center; font-size:12px; color:var(--muted); margin-top:4px;}
   .setting-row{display:flex; align-items:center; gap:12px; background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:14px;}
   .setting-info{flex:1;}
   .setting-title{font-size:15px; font-weight:800;}
@@ -529,10 +559,26 @@
     <div class="hist" id="histList"></div>
   </div>
 
-  <!-- ===================== ACHIEVEMENTS ===================== -->
+  <!-- ===================== TASBEEH ===================== -->
+  <div class="page" id="page-tasbeeh">
+    <div class="sec-title"><span class="bar"></span> 📿 عدّاد التسبيح</div>
+    <div class="tasbeeh-card">
+      <div class="tb-dhikr" id="tbDhikr">سُبْحَانَ اللَّهِ</div>
+      <div class="tb-virtue" id="tbVirtue"></div>
+      <button class="tb-counter" id="tbCounter"><b id="tbCount">0</b><span>اضغط للتسبيح</span></button>
+      <div class="tb-controls">
+        <button class="tb-reset" id="tbReset">🔄 تصفير</button>
+        <div class="tb-total">الإجمالي: <b id="tbTotal">0</b></div>
+      </div>
+    </div>
+    <div class="sec-title"><span class="bar"></span> اختر ذكراً وفضله</div>
+    <div id="tbList"></div>
+  </div>
+
+  <!-- ===================== GARDEN ===================== -->
   <div class="page" id="page-ach">
-    <div class="sec-title"><span class="bar"></span> إنجازاتك</div>
-    <div class="ach-grid" id="achGrid"></div>
+    <div class="sec-title"><span class="bar"></span> 🌳 حديقة الصلاة</div>
+    <div id="gardenCard"></div>
 
     <div class="sec-title"><span class="bar"></span> الإعدادات</div>
     <button class="tool-btn gold" id="openSettingsBtn"><span class="te">⚙️</span> الإعدادات والتخصيص</button>
@@ -593,6 +639,7 @@
       </div>
       <button class="notif-btn" id="installBtn" style="display:none;margin-top:6px">📲 ثبّت التطبيق على جهازك</button>
       <button class="tool-btn gold" id="editAdhkarBtn" style="margin-top:10px"><span class="te">✏️</span> تخصيص أذكار الصلاة</button>
+      <button class="tool-btn gold" id="editMeBtn" style="margin-top:8px"><span class="te">✏️</span> تخصيص أذكار الصباح والمساء</button>
       <div class="notif-note">لضمان وصول التذكير حتى والتطبيق مغلق (خاصة على iPhone)، استخدم «تذكيرات التقويم» في قسم الأدوات.</div>
     </div>
   </div>
@@ -600,7 +647,7 @@
 
 <div class="modal" id="editModal">
   <div class="sheet">
-    <div class="sheet-head"><b>✏️ تخصيص الأذكار</b><button id="editClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-head"><b id="editTitle">✏️ تخصيص الأذكار</b><button id="editClose" aria-label="إغلاق">✕</button></div>
     <div class="city-list" id="editList"></div>
     <div class="edit-add">
       <input class="city-search" id="newDhikrText" type="text" placeholder="نص الذكر…" autocomplete="off">
@@ -609,7 +656,7 @@
         <button class="tool-btn gold" id="addDhikrBtn" style="margin:0;flex:1;justify-content:center">➕ إضافة ذكر</button>
       </div>
       <button class="tool-btn" id="restoreAdhkarBtn" style="margin-top:8px;justify-content:center">↩️ استعادة الأذكار الافتراضية</button>
-      <div class="notif-note">التعديلات تُطبّق على كل الصلوات. المعوّذات الافتراضية تتكرر ٣ مرات في الفجر والمغرب تلقائياً.</div>
+      <div class="notif-note" id="editNote">التعديلات تُطبّق على كل الصلوات. المعوّذات الافتراضية تتكرر ٣ مرات في الفجر والمغرب تلقائياً. استخدم ▲▼ لإعادة الترتيب.</div>
     </div>
   </div>
 </div>
@@ -625,7 +672,8 @@
 <nav>
   <button data-page="today" class="on"><span class="ni">🕌</span>اليوم</button>
   <button data-page="summary"><span class="ni">📊</span>الملخص</button>
-  <button data-page="ach"><span class="ni">🏆</span>الإنجازات</button>
+  <button data-page="tasbeeh"><span class="ni">📿</span>التسبيح</button>
+  <button data-page="ach"><span class="ni">🌳</span>الحديقة</button>
 </nav>
 
 <script>
@@ -701,7 +749,11 @@ function load(){
   if(typeof d.adhkarEnabled!=='boolean') d.adhkarEnabled=true;   // أذكار ما بعد الصلاة
   if(typeof d.meEnabled!=='boolean') d.meEnabled=true;           // أذكار الصباح والمساء
   if(!Array.isArray(d.adhkarList)) d.adhkarList=null;            // null = استخدم الافتراضي
+  if(!Array.isArray(d.meList)) d.meList=null;                    // أذكار الصباح/المساء المخصّصة
   if(!d.adhkarProg) d.adhkarProg={};                             // حفظ تقدّم الأذكار
+  if(typeof d.tbCount!=='number') d.tbCount=0;                   // عدّاد التسبيح الحالي
+  if(typeof d.tbTotal!=='number') d.tbTotal=0;                   // إجمالي التسبيح
+  if(typeof d.tbSel!=='number') d.tbSel=0;                       // الذكر المختار
   return d;
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(DB)); }
@@ -1065,7 +1117,7 @@ function renderPrayers(){
             <span class="bonus-label">${on?'✓ ':'➕ '}${bd.label}</span>
             <span class="bonus-pts">+5</span>
           </div>`; }).join('') : ''}
-        ${cur!=null && DB.adhkarEnabled ? `<button class="adhkar-btn" data-pid="${p.id}" data-pname="${displayName(p,viewDate)}">📿 قراءة أذكار ما بعد الصلاة</button>` : ''}
+        ${cur!=null && DB.adhkarEnabled ? `<button class="adhkar-btn${adhkarAllDone(key,p.id)?' done':''}" data-pid="${p.id}" data-pname="${displayName(p,viewDate)}">${adhkarAllDone(key,p.id)?'✓ أتممت أذكار ما بعد الصلاة':'📿 قراءة أذكار ما بعد الصلاة'}</button>` : ''}
       </div>`;
     card.innerHTML=`
       <div class="p-head">
@@ -1450,16 +1502,46 @@ function checkAchievements(){
   let newly=[];
   ACHIEVEMENTS.forEach(a=>{ if(res[a.id] && !DB.ach[a.id]){ DB.ach[a.id]=true; newly.push(a); } });
   if(newly.length){ save(); newly.forEach(a=> toast('🏆 إنجاز جديد: '+a.n)); }
-  renderAch();
+  renderGarden();
 }
-function renderAch(){
-  const g=document.getElementById('achGrid');
-  g.innerHTML=ACHIEVEMENTS.map(a=>`
-    <div class="ach${DB.ach[a.id]?' unlocked':''}">
-      <div class="ae">${a.e}</div>
-      <div class="an">${a.n}</div>
-      <div class="ad">${a.d}</div>
-    </div>`).join('');
+/* ================= حديقة الصلاة ================= */
+function renderGarden(){
+  const el=document.getElementById('gardenCard'); if(!el) return;
+  const perfect=totalPoints(), streak=currentStreak();
+  let totalLogged=0; Object.keys(DB.days).forEach(k=>{ const dd=DB.days[k]; PRAYERS.forEach(p=>{ if(dd[p.id]!=null) totalLogged++; }); });
+  const stages=[{min:0,name:'بذرة'},{min:1,name:'برعم'},{min:3,name:'شتلة'},{min:7,name:'شجرة صغيرة'},{min:15,name:'شجرة يانعة'},{min:30,name:'حديقة مزهرة'}];
+  let si=0; stages.forEach((s,i)=>{ if(perfect>=s.min) si=i; });
+  const W=340,H=200, gy=160, cx=W/2;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  svg+=`<defs><linearGradient id="gsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#123f2d"/><stop offset="1" stop-color="#0c3223"/></linearGradient></defs>`;
+  svg+=`<rect width="${W}" height="${H}" fill="url(#gsky)"/>`;
+  svg+=`<circle cx="${W-44}" cy="40" r="18" fill="#e9c46a" opacity="0.9"/>`;
+  svg+=`<path d="M0 ${gy} Q ${cx} ${gy-14} ${W} ${gy} L ${W} ${H} L 0 ${H} Z" fill="#2b6b3f"/>`;
+  svg+=`<path d="M0 ${gy+12} Q ${cx} ${gy-2} ${W} ${gy+12} L ${W} ${H} L 0 ${H} Z" fill="#1f5230"/>`;
+  if(si===0){
+    svg+=`<ellipse cx="${cx}" cy="${gy}" rx="16" ry="6" fill="#3a2a12"/><circle cx="${cx}" cy="${gy-4}" r="4.5" fill="#e9c46a"/>`;
+  }else{
+    const scale=[0,0.35,0.55,0.78,0.98,1.18][si], trunkH=52*scale, trunkW=8*scale+3, canopyR=34*scale, topY=gy-trunkH;
+    svg+=`<rect x="${cx-trunkW/2}" y="${topY}" width="${trunkW}" height="${trunkH}" rx="3" fill="#7c4a1e"/>`;
+    svg+=`<circle cx="${cx}" cy="${topY-canopyR*0.5}" r="${canopyR}" fill="#2e8b57"/>`;
+    svg+=`<circle cx="${cx-canopyR*0.7}" cy="${topY-canopyR*0.15}" r="${canopyR*0.72}" fill="#3aa06a"/>`;
+    svg+=`<circle cx="${cx+canopyR*0.7}" cy="${topY-canopyR*0.15}" r="${canopyR*0.72}" fill="#278a54"/>`;
+    if(si>=4){ for(let i=0;i<6;i++){ const ang=(i/6)*6.283; svg+=`<circle cx="${(cx+Math.cos(ang)*canopyR*0.7).toFixed(1)}" cy="${(topY-canopyR*0.4+Math.sin(ang)*canopyR*0.55).toFixed(1)}" r="3.5" fill="${si>=5?'#ff9ec4':'#e9c46a'}"/>`; } }
+  }
+  const nFlowers=Math.min(perfect,10), spots=[28,58,92,120,150,190,215,245,278,308];
+  for(let i=0;i<nFlowers;i++){ const x=spots[i], y=gy+9+((i%2)*6), col=['#e9c46a','#ff9ec4','#f4a261','#e76f9e','#ffd166'][i%5];
+    svg+=`<g transform="translate(${x},${y})"><rect x="-0.8" y="2" width="1.6" height="8" fill="#2e8b57"/><circle r="4" fill="${col}"/><circle r="1.6" fill="#fff"/></g>`; }
+  for(let i=0;i<8;i++){ const x=15+i*42; svg+=`<path d="M${x} ${gy+13} q 2 -8 4 0 M${x+3} ${gy+13} q 2 -10 4 0" stroke="#3aa06a" stroke-width="1.4" fill="none"/>`; }
+  svg+=`</svg>`;
+  const msgs=['ازرع أول يوم مثالي لتنمو حديقتك 🌱','بدأت حديقتك تنبت، واصل!','حديقتك تكبر يوماً بعد يوم 🌿','ما شاء الله، شجرتك تنمو 🌳','حديقتك يانعة، ثبّتك الله 🌟','حديقة مزهرة! أصبحت قدوة 🌸'];
+  el.innerHTML=`<div class="garden-card">${svg}</div>
+    <div class="garden-stage">المرحلة: ${stages[si].name}${si<5?` — التالي بعد ${stages[si+1].min-perfect} يوم مثالي`:''}</div>
+    <div class="garden-msg">${msgs[si]}</div>
+    <div class="garden-stats">
+      <div class="garden-stat"><b>${perfect}</b><span>يوم مثالي 🌟</span></div>
+      <div class="garden-stat"><b>${streak}</b><span>سلسلة 🔥</span></div>
+      <div class="garden-stat"><b>${totalLogged}</b><span>صلاة مسجّلة</span></div>
+    </div>`;
 }
 
 /* ================= UI PLUMBING ================= */
@@ -1476,7 +1558,8 @@ function switchPage(name){
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.page===name));
   if(name==='summary') renderSummary();
-  if(name==='ach') renderAch();
+  if(name==='ach') renderGarden();
+  if(name==='tasbeeh') renderTasbeeh();
   window.scrollTo(0,0);
 }
 document.querySelectorAll('nav button').forEach(b=> b.addEventListener('click',()=>switchPage(b.dataset.page)));
@@ -1490,7 +1573,7 @@ document.getElementById('nextDay').addEventListener('click',()=>{ if(ymd(viewDat
 document.getElementById('resetBtn').addEventListener('click',()=>{
   if(confirm('هل تريد حذف كل بياناتك والبدء من جديد؟ لا يمكن التراجع.')){
     DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:CITY.id,female:DB.female}; save(); viewDate=new Date();
-    renderPrayers(); renderHero(); renderAch(); toast('تم حذف البيانات');
+    renderPrayers(); renderHero(); renderGarden(); toast('تم حذف البيانات');
   }
 });
 
@@ -1535,37 +1618,60 @@ document.getElementById('meToggle').addEventListener('change',e=>{
 /* ===== محرّر أذكار الصلاة ===== */
 const editModal=document.getElementById('editModal');
 const editList=document.getElementById('editList');
-function ensureCustomList(){ if(!DB.adhkarList || !DB.adhkarList.length) DB.adhkarList=DEFAULT_ADHKAR.map(a=>Object.assign({},a)); }
+let editTarget='prayer'; // 'prayer' | 'me'
+// يرجّع مصفوفة القائمة القابلة للتعديل (ينسخ الافتراضي عند أول تعديل)
+function ensureEditArr(){
+  if(editTarget==='me'){ if(!DB.meList || !DB.meList.length) DB.meList=DEFAULT_ME.map(a=>Object.assign({},a)); return DB.meList; }
+  if(!DB.adhkarList || !DB.adhkarList.length) DB.adhkarList=DEFAULT_ADHKAR.map(a=>Object.assign({},a)); return DB.adhkarList;
+}
+function editArr(){ return editTarget==='me' ? getME() : getAdhkar(); }
 function renderEditList(){
-  editList.innerHTML=getAdhkar().map(a=>`
+  const list=editArr();
+  editList.innerHTML=list.map((a,i)=>`
     <div class="dhikr-edit" data-id="${a.id}">
+      <div class="de-reorder">
+        <button class="de-mv" data-mv="up" data-i="${i}" ${i===0?'disabled':''} aria-label="لأعلى">▲</button>
+        <button class="de-mv" data-mv="down" data-i="${i}" ${i===list.length-1?'disabled':''} aria-label="لأسفل">▼</button>
+      </div>
       <div class="de-text">${esc(a.text)}${a.tri?' <span style="color:var(--muted)">(×٣ فجر/مغرب)</span>':''}</div>
       <span class="de-count" data-cnt="${a.id}">×${a.c}</span>
       <button class="de-del" data-del="${a.id}" aria-label="حذف">🗑</button>
     </div>`).join('');
-  editList.querySelectorAll('.de-del').forEach(el=> el.addEventListener('click',()=>{ ensureCustomList(); DB.adhkarList=DB.adhkarList.filter(a=>a.id!==el.dataset.del); save(); renderEditList(); toast('🗑 تم حذف الذكر'); }));
+  editList.querySelectorAll('.de-del').forEach(el=> el.addEventListener('click',()=>{
+    const arr=ensureEditArr(); const idx=arr.findIndex(a=>a.id===el.dataset.del); if(idx>=0) arr.splice(idx,1); save(); renderEditList(); toast('🗑 تم حذف الذكر'); }));
   editList.querySelectorAll('.de-count').forEach(el=> el.addEventListener('click',()=>{
-    ensureCustomList(); const a=DB.adhkarList.find(x=>x.id===el.dataset.cnt); if(!a) return;
-    const v=prompt('عدد التكرار:', a.c); if(v===null) return; a.c=Math.max(1, parseInt(v)||1); delete a.tri; save(); renderEditList();
-  }));
+    const arr=ensureEditArr(); const a=arr.find(x=>x.id===el.dataset.cnt); if(!a) return;
+    const v=prompt('عدد التكرار:', a.c); if(v===null) return; a.c=Math.max(1, parseInt(v)||1); delete a.tri; save(); renderEditList(); }));
+  editList.querySelectorAll('.de-mv').forEach(el=> el.addEventListener('click',()=>{
+    const arr=ensureEditArr(); const i=+el.dataset.i, j=el.dataset.mv==='up'?i-1:i+1;
+    if(j<0||j>=arr.length) return; const t=arr[i]; arr[i]=arr[j]; arr[j]=t; save(); renderEditList(); }));
 }
-document.getElementById('editAdhkarBtn').addEventListener('click',()=>{ renderEditList(); settingsModal.classList.remove('show'); editModal.classList.add('show'); editList.scrollTop=0; });
+function openEditor(target){
+  editTarget=target;
+  document.getElementById('editTitle').textContent = target==='me' ? '✏️ تخصيص أذكار الصباح والمساء' : '✏️ تخصيص أذكار الصلاة';
+  document.getElementById('editNote').textContent = target==='me'
+    ? 'التعديلات تُطبّق على أذكار الصباح والمساء. استخدم ▲▼ لإعادة الترتيب.'
+    : 'التعديلات تُطبّق على كل الصلوات. المعوّذات الافتراضية تتكرر ٣ مرات في الفجر والمغرب تلقائياً. استخدم ▲▼ لإعادة الترتيب.';
+  renderEditList(); settingsModal.classList.remove('show'); editModal.classList.add('show'); editList.scrollTop=0;
+}
+document.getElementById('editAdhkarBtn').addEventListener('click',()=>openEditor('prayer'));
+document.getElementById('editMeBtn').addEventListener('click',()=>openEditor('me'));
 document.getElementById('editClose').addEventListener('click',()=>editModal.classList.remove('show'));
 editModal.addEventListener('click',e=>{ if(e.target===editModal) editModal.classList.remove('show'); });
 document.getElementById('addDhikrBtn').addEventListener('click',()=>{
   const t=document.getElementById('newDhikrText').value.trim();
   const c=Math.max(1, parseInt(document.getElementById('newDhikrCount').value)||1);
   if(!t){ toast('اكتب نص الذكر أولاً'); return; }
-  ensureCustomList(); DB.adhkarList.push({id:'c'+Date.now(), text:t.slice(0,300), c}); save();
+  ensureEditArr().push({id:'c'+Date.now(), text:t.slice(0,300), c}); save();
   document.getElementById('newDhikrText').value=''; document.getElementById('newDhikrCount').value=1;
   renderEditList(); toast('➕ تمت إضافة الذكر');
 });
 document.getElementById('restoreAdhkarBtn').addEventListener('click',()=>{
-  if(confirm('استعادة الأذكار الافتراضية؟ سيتم حذف تعديلاتك.')){ DB.adhkarList=null; save(); renderEditList(); toast('↩️ تمت الاستعادة'); }
+  if(confirm('استعادة الأذكار الافتراضية؟ سيتم حذف تعديلاتك.')){ if(editTarget==='me') DB.meList=null; else DB.adhkarList=null; save(); renderEditList(); toast('↩️ تمت الاستعادة'); }
 });
 
 /* ===== أذكار الصباح والمساء ===== */
-const ME_ADHKAR=[
+const DEFAULT_ME=[
   {id:'kursi',   text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ… وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
   {id:'ikhlas',  text:'قُلْ هُوَ اللَّهُ أَحَدٌ (سورة الإخلاص)', c:3},
   {id:'falaq',   text:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (سورة الفلق)', c:3},
@@ -1579,6 +1685,7 @@ const ME_ADHKAR=[
   {id:'tahleel', text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ', c:10},
   {id:'salawat', text:'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَىٰ نَبِيِّنَا مُحَمَّدٍ', c:10},
 ];
+function getME(){ return (DB.meList && DB.meList.length) ? DB.meList : DEFAULT_ME; }
 const meModal=document.getElementById('meModal');
 const meListEl=document.getElementById('meList');
 const meBtn=document.getElementById('meBtn');
@@ -1594,13 +1701,13 @@ function updateMeBtn(){
 function openME(){
   const per=mePeriod(), key='me_'+ymd(new Date())+'_'+per;
   meCtx={key}; const saved=DB.adhkarProg[key]||{};
-  meCounts={}; ME_ADHKAR.forEach(a=> meCounts[a.id]=saved[a.id]||0);
+  meCounts={}; getME().forEach(a=> meCounts[a.id]=saved[a.id]||0);
   document.getElementById('meTitle').textContent = per==='morning'?'🌅 أذكار الصباح':'🌇 أذكار المساء';
   renderMEList(); meModal.classList.add('show'); meListEl.scrollTop=0;
 }
 function saveME(){ if(!meCtx) return; const any=Object.values(meCounts).some(v=>v>0); if(any) DB.adhkarProg[meCtx.key]=Object.assign({},meCounts); else delete DB.adhkarProg[meCtx.key]; save(); }
 function renderMEList(){
-  meListEl.innerHTML=ME_ADHKAR.map(a=>{ const n=meCounts[a.id]||0, done=n>=a.c;
+  meListEl.innerHTML=getME().map(a=>{ const n=meCounts[a.id]||0, done=n>=a.c;
     return `<div class="dhikr${done?' done':''}" data-id="${a.id}">
       <div class="dtext">${esc(a.text)}</div>
       <div class="dfoot"><span class="dhint">${a.c>1?'اضغط للعدّ':'اضغط عند الانتهاء'}</span>
@@ -1609,18 +1716,53 @@ function renderMEList(){
   meListEl.querySelectorAll('.dhikr').forEach(el=> el.addEventListener('click',()=>tapME(el.dataset.id)));
 }
 function tapME(id){
-  const a=ME_ADHKAR.find(x=>x.id===id); if(!a) return;
+  const a=getME().find(x=>x.id===id); if(!a) return;
   if((meCounts[id]||0)<a.c){ meCounts[id]=(meCounts[id]||0)+1; buzz(8); }
   saveME();
   const el=meListEl.querySelector('.dhikr[data-id="'+id+'"]'); const n=meCounts[id], done=n>=a.c;
   el.classList.toggle('done',done); el.querySelector('.dcount').textContent=(done?'✓ ':'')+n+' / '+a.c;
-  if(ME_ADHKAR.every(x=>(meCounts[x.id]||0)>=x.c)) toast('🌟 تقبّل الله، أتممت الأذكار');
+  if(getME().every(x=>(meCounts[x.id]||0)>=x.c)) toast('🌟 تقبّل الله، أتممت الأذكار');
 }
 meBtn.addEventListener('click',openME);
 document.getElementById('meClose').addEventListener('click',()=>meModal.classList.remove('show'));
 document.getElementById('meReset').addEventListener('click',()=>{ meCounts={}; saveME(); renderMEList(); toast('🔄 تم تصفير الأذكار'); });
 meModal.addEventListener('click',e=>{ if(e.target===meModal) meModal.classList.remove('show'); });
 updateMeBtn();
+
+/* ================= عدّاد التسبيح ================= */
+const TASBEEH=[
+  {t:'سُبْحَانَ اللَّهِ', v:'من سبّح الله مئة مرة كُتبت له ألف حسنة أو حُطّت عنه ألف خطيئة'},
+  {t:'الْحَمْدُ لِلَّهِ', v:'تملأ الميزان'},
+  {t:'اللَّهُ أَكْبَرُ', v:'من أحبّ الكلام إلى الله'},
+  {t:'لَا إِلَٰهَ إِلَّا اللَّهُ', v:'أفضل الذكر'},
+  {t:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', v:'من قالها مئة مرة حُطّت خطاياه ولو كانت مثل زبد البحر'},
+  {t:'سُبْحَانَ اللَّهِ الْعَظِيمِ وَبِحَمْدِهِ', v:'كلمتان خفيفتان على اللسان ثقيلتان في الميزان، حبيبتان إلى الرحمن'},
+  {t:'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', v:'كنز من كنوز الجنة'},
+  {t:'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ', v:'من لزم الاستغفار جعل الله له من كل همٍّ فرجاً ومن كل ضيقٍ مخرجاً'},
+  {t:'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', v:'من صلّى عليّ صلاةً صلّى الله عليه بها عشراً'},
+];
+function renderTasbeeh(){
+  const sel=Math.min(DB.tbSel||0, TASBEEH.length-1); DB.tbSel=sel;
+  document.getElementById('tbDhikr').textContent=TASBEEH[sel].t;
+  document.getElementById('tbVirtue').textContent='✨ '+TASBEEH[sel].v;
+  document.getElementById('tbCount').textContent=DB.tbCount;
+  document.getElementById('tbTotal').textContent=(DB.tbTotal||0).toLocaleString('ar-EG');
+  const list=document.getElementById('tbList');
+  list.innerHTML=TASBEEH.map((x,i)=>`
+    <div class="tb-item${i===sel?' sel':''}" data-i="${i}">
+      <div class="tbi-dhikr">${x.t}</div>
+      <div class="tbi-virtue">✨ ${x.v}</div>
+    </div>`).join('');
+  list.querySelectorAll('.tb-item').forEach(el=> el.addEventListener('click',()=>{ DB.tbSel=+el.dataset.i; DB.tbCount=0; save(); renderTasbeeh(); toast('📿 اختر وابدأ التسبيح'); }));
+}
+document.getElementById('tbCounter').addEventListener('click',()=>{
+  DB.tbCount++; DB.tbTotal=(DB.tbTotal||0)+1; buzz(8);
+  document.getElementById('tbCount').textContent=DB.tbCount;
+  document.getElementById('tbTotal').textContent=DB.tbTotal.toLocaleString('ar-EG');
+  if(DB.tbCount===33||DB.tbCount===100){ buzz([25,40,25]); toast('📿 '+DB.tbCount+' — تقبّل الله'); }
+  save();
+});
+document.getElementById('tbReset').addEventListener('click',()=>{ DB.tbCount=0; save(); document.getElementById('tbCount').textContent='0'; toast('🔄 تم تصفير العدّاد'); });
 
 /* ================= CITY PICKER ================= */
 const cityModal=document.getElementById('cityModal');
@@ -1668,6 +1810,8 @@ const DEFAULT_ADHKAR=[
 function getAdhkar(){ return (DB.adhkarList && DB.adhkarList.length) ? DB.adhkarList : DEFAULT_ADHKAR; }
 // العدد الفعّال: المعوّذات ٣ للفجر والمغرب، ومرّة لغيرها
 function effCount(a, pid){ if(a.tri) return (pid==='fajr'||pid==='maghrib')?3:1; return a.c; }
+// هل أُتمّت كل أذكار هذه الصلاة (لعرض علامة ✓ على الزر)
+function adhkarAllDone(key, pid){ const s=DB.adhkarProg[key+'_'+pid]; if(!s) return false; return getAdhkar().every(a=>(s[a.id]||0)>=effCount(a,pid)); }
 
 let adhkarCounts={}, adhkarCtx=null;
 const adhkarModal=document.getElementById('adhkarModal');
@@ -1682,7 +1826,7 @@ function openAdhkar(pid, prayerName){
   renderAdhkarList();
   adhkarModal.classList.add('show'); adhkarListEl.scrollTop=0;
 }
-function closeAdhkar(){ adhkarModal.classList.remove('show'); }
+function closeAdhkar(){ adhkarModal.classList.remove('show'); renderPrayers(); }
 function saveAdhkarProg(){
   if(!adhkarCtx) return;
   const any=Object.values(adhkarCounts).some(v=>v>0);
@@ -1745,7 +1889,7 @@ document.getElementById('importFile').addEventListener('change',e=>{
       if(!confirm('سيتم استبدال بياناتك الحالية ببيانات الملف. متابعة؟')) return;
       DB=Object.assign({days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:'jeddah'}, obj);
       save(); viewDate=new Date(); setCity(DB.city); updateCityName();
-      renderPrayers(); renderHero(); renderAch(); toast('📥 تم استيراد البيانات بنجاح');
+      renderPrayers(); renderHero(); renderGarden(); toast('📥 تم استيراد البيانات بنجاح');
     }catch(err){ toast('تعذّر قراءة الملف — تأكد أنه نسخة صحيحة'); }
   };
   r.readAsText(f);
@@ -1900,7 +2044,7 @@ async function scheduleReminders(){
 document.getElementById('hijriDate').textContent=hijri(new Date());
 updateCityName();
 updateNotifBtn();
-renderHero(); renderPrayers(); renderAch();
+renderHero(); renderPrayers(); renderGarden();
 reminderCheck();
 scheduleReminders();
 setInterval(()=>{ reminderCheck(); if(document.getElementById('page-today').classList.contains('active')){ renderNextPrayer(); } }, 30000);
