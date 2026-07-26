@@ -22,7 +22,30 @@
     --bg:#0b1f17; --bg2:#0f2a1e; --card:#12352666; --card-solid:#123526;
     --gold:#e9c46a; --gold-d:#c99a3b;
     --txt:#eef7f1; --muted:#9db8ab; --line:#1e4535;
+    --inner:var(--inner); --inner2:var(--inner2);
   }
+  /* ===== Light theme ===== */
+  :root[data-theme="light"]{
+    --bg:#eef4f0; --bg2:#e3ece6; --card:#ffffff; --card-solid:#ffffff;
+    --gold:#a9781a; --gold-d:#8a5f10;
+    --txt:#15281f; --muted:#5f7a6d; --line:#d3e1d8;
+    --inner:#eaf1ec; --inner2:#e7efe9;
+  }
+  :root[data-theme="light"] body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #cfe9d866, transparent 60%),
+      linear-gradient(180deg,#eef4f0,#e3ece6);
+  }
+  :root[data-theme="light"] .hero,
+  :root[data-theme="light"] .daily-card,
+  :root[data-theme="light"] .feedback,
+  :root[data-theme="light"] .friday-card{ background:linear-gradient(145deg,#dcefe3,#cbe4d4) !important; }
+  :root[data-theme="light"] .daily-card.strong{ background:linear-gradient(145deg,#f4e2b0,#ecd490) !important; }
+  :root[data-theme="light"] .rank-pts b,
+  :root[data-theme="light"] .daily-center b,
+  :root[data-theme="light"] .next-card .ntime b{ color:#15281f !important; }
+  :root[data-theme="light"] nav{ background:#ffffffee !important; }
+  :root[data-theme="light"] .toast{ background:linear-gradient(145deg,#dcefe3,#cbe4d4); color:#15281f; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0;}
   html{height:auto;}
   body{
@@ -67,7 +90,7 @@
   .rank-pts{text-align:center;}
   .rank-pts b{font-size:22px; color:#fff; display:block; line-height:1;}
   .rank-pts span{font-size:11px; color:var(--muted);}
-  .xp-bar{height:10px; background:#0a2418; border-radius:99px; margin-top:14px; overflow:hidden; border:1px solid #0006;}
+  .xp-bar{height:10px; background:var(--inner); border-radius:99px; margin-top:14px; overflow:hidden; border:1px solid #0006;}
   .xp-fill{height:100%; background:linear-gradient(90deg,var(--gold-d),var(--gold)); border-radius:99px; width:0; transition:width .6s cubic-bezier(.2,.8,.2,1);}
   .xp-label{display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:6px;}
 
@@ -75,7 +98,7 @@
   .daily-card{display:flex; align-items:center; gap:16px; background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--line); border-radius:20px; padding:16px; margin-top:14px; box-shadow:0 10px 26px -14px #000a, inset 0 1px 0 #ffffff10;}
   .daily-ringwrap{position:relative; width:92px; height:92px; flex:none;}
   .daily-svg{width:92px; height:92px; transform:rotate(-90deg);}
-  .daily-bg{fill:none; stroke:#0a2418; stroke-width:8;}
+  .daily-bg{fill:none; stroke:var(--inner); stroke-width:8;}
   .daily-fg{fill:none; stroke:var(--gold); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1), stroke .3s;}
   .daily-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
   .daily-center b{font-size:25px; color:#fff; line-height:1; font-weight:800;}
@@ -102,7 +125,7 @@
   .bonus-row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; padding:10px 12px; border-radius:12px; border:1px dashed var(--gold-d); background:#7c4a1e14; color:var(--gold); cursor:pointer; font-size:12.5px; font-weight:700; transition:.15s; -webkit-user-select:none; user-select:none;}
   .bonus-row:active{transform:scale(.98);}
   .bonus-row.on{border-style:solid; border-color:var(--green-d); background:#16a34a1a; color:#6ee7a0;}
-  .bonus-pts{font-weight:900; background:#0a2418; border:1px solid var(--gold-d); border-radius:99px; padding:3px 11px; direction:ltr; unicode-bidi:isolate;}
+  .bonus-pts{font-weight:900; background:var(--inner); border:1px solid var(--gold-d); border-radius:99px; padding:3px 11px; direction:ltr; unicode-bidi:isolate;}
   .bonus-row.on .bonus-pts{color:#6ee7a0; border-color:var(--green-d);}
   .friday-card{background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--gold-d); border-radius:16px; padding:12px;}
   .friday-card .bonus-row{margin-top:0; margin-bottom:8px;}
@@ -131,11 +154,11 @@
   }
   .prayer.done{box-shadow:0 0 0 1.5px var(--pc, var(--line)) inset, 0 8px 20px -12px var(--pc, #000);}
   .p-head{display:flex; align-items:center; gap:10px;}
-  .p-icon{width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:20px; background:#0a2418;}
+  .p-icon{width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:20px; background:var(--inner);}
   .p-name{font-size:16px; font-weight:800; flex:1;}
-  .p-status{font-size:12px; font-weight:700; padding:4px 10px; border-radius:99px; background:#0a2418; color:var(--muted);}
+  .p-status{font-size:12px; font-weight:700; padding:4px 10px; border-radius:99px; background:var(--inner); color:var(--muted);}
   .p-status.set{color:#08130d;}
-  .p-toggle{width:30px; height:30px; border-radius:9px; border:1px solid var(--line); background:#0a2418; color:var(--gold); font-size:15px; cursor:pointer; display:grid; place-items:center; transition:.2s; flex:none;}
+  .p-toggle{width:30px; height:30px; border-radius:9px; border:1px solid var(--line); background:var(--inner); color:var(--gold); font-size:15px; cursor:pointer; display:grid; place-items:center; transition:.2s; flex:none;}
   .p-toggle:active{transform:scale(.9);}
   .p-toggle .chev{transition:transform .25s;}
   .prayer.collapsed{padding:12px 14px;}
@@ -144,7 +167,7 @@
   .p-body{animation:fade .25s;}
   .levels{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:12px;}
   .lvl{
-    border:1px solid var(--line); background:#0c2a1d;
+    border:1px solid var(--line); background:var(--inner2);
     border-radius:12px; padding:8px 4px; text-align:center; cursor:pointer;
     transition:.15s; position:relative;
   }
@@ -152,7 +175,7 @@
   .lvl .dot{width:22px; height:22px; border-radius:50%; margin:0 auto 5px; box-shadow:0 2px 6px #0006; display:grid; place-items:center; transition:.22s cubic-bezier(.2,.9,.3,1.4);}
   .lvl .dot .face{font-size:14px; opacity:0; transform:scale(0); transition:.2s; line-height:1;}
   .lvl .lt{font-size:9.5px; line-height:1.25; color:var(--muted); font-weight:600;}
-  .lvl.on{border-color:var(--lc); background:color-mix(in srgb,var(--lc) 22%, #0c2a1d);}
+  .lvl.on{border-color:var(--lc); background:color-mix(in srgb,var(--lc) 22%, var(--inner2));}
   .lvl.on .lt{color:#fff;}
   .lvl.on .dot{width:30px; height:30px; background:transparent !important; box-shadow:none;}
   .lvl.on .dot .face{opacity:1; transform:scale(1); animation:facePop .35s cubic-bezier(.2,.9,.3,1.5);}
@@ -180,7 +203,7 @@
   .ch-title{font-size:14px; font-weight:800; flex:1;}
   .ch-val{font-size:13px; font-weight:800; color:var(--gold); direction:ltr; unicode-bidi:isolate; flex:none;}
   .challenge.done .ch-val{color:#6ee7a0;}
-  .ch-track{height:10px; background:#0a2418; border-radius:99px; overflow:hidden; border:1px solid #0006;}
+  .ch-track{height:10px; background:var(--inner); border-radius:99px; overflow:hidden; border:1px solid #0006;}
   .ch-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,var(--gold-d),var(--gold)); transition:width .6s cubic-bezier(.2,.8,.2,1); width:0;}
   .challenge.done .ch-fill{background:linear-gradient(90deg,var(--green-d),#22c55e);}
 
@@ -197,11 +220,11 @@
   .brow{display:flex; align-items:center; gap:10px; margin:9px 0;}
   .brow .bdot{width:14px; height:14px; border-radius:50%; flex:none;}
   .brow .bname{font-size:13px; width:82px; flex:none;}
-  .brow .btrack{flex:1; height:9px; background:#0a2418; border-radius:99px; overflow:hidden;}
+  .brow .btrack{flex:1; height:9px; background:var(--inner); border-radius:99px; overflow:hidden;}
   .brow .bfill{height:100%; border-radius:99px; transition:width .5s;}
   .brow .bval{font-size:12px; color:var(--muted); width:34px; text-align:left; flex:none;}
 
-  .range-tabs{display:flex; gap:8px; background:#0a2418; padding:5px; border-radius:14px; margin-bottom:14px;}
+  .range-tabs{display:flex; gap:8px; background:var(--inner); padding:5px; border-radius:14px; margin-bottom:14px;}
   .range-tabs button{
     flex:1; border:0; background:transparent; color:var(--muted);
     padding:8px; border-radius:10px; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer;
@@ -213,7 +236,7 @@
   .hrow:first-child{border-top:0;}
   .hrow .hdate{font-size:13px; font-weight:700; width:96px; flex:none;}
   .hrow .hdots{display:flex; gap:5px; flex:1;}
-  .hrow .hd{width:16px; height:16px; border-radius:50%; background:#0a2418; border:1px solid var(--line);}
+  .hrow .hd{width:16px; height:16px; border-radius:50%; background:var(--inner); border:1px solid var(--line);}
   .hrow .hpct{font-size:12px; font-weight:800; width:38px; text-align:left;}
   .empty{text-align:center; color:var(--muted); padding:30px 16px; font-size:14px;}
 
@@ -287,7 +310,7 @@
   .notif-btn.on{border-color:var(--green-d); background:#16a34a22; color:#6ee7a0;}
   .notif-note{font-size:11px; color:var(--muted); text-align:center; margin-top:8px; line-height:1.5;}
 
-  .p-time{font-size:12px; color:var(--muted); font-weight:700; margin-inline-start:auto; background:#0a2418; padding:3px 8px; border-radius:8px;}
+  .p-time{font-size:12px; color:var(--muted); font-weight:700; margin-inline-start:auto; background:var(--inner); padding:3px 8px; border-radius:8px;}
   .prayer.due{animation:pulse 1.6s infinite;}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 #e9c46a00;} 50%{box-shadow:0 0 0 2px #e9c46a99;}}
   .due-flag{font-size:11px; color:var(--gold); font-weight:800; margin-top:8px; display:flex; align-items:center; gap:5px;}
@@ -302,11 +325,11 @@
   .sheet-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
   .sheet-head b{font-size:17px;}
   .sheet-head button{width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:var(--card-solid); color:var(--txt); font-size:15px; cursor:pointer;}
-  .city-search{width:100%; padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:#0a2418; color:var(--txt); font-family:inherit; font-size:15px; margin-bottom:10px;}
+  .city-search{width:100%; padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:var(--inner); color:var(--txt); font-family:inherit; font-size:15px; margin-bottom:10px;}
   .city-search::placeholder{color:var(--muted);}
   .city-list{overflow-y:auto; -webkit-overflow-scrolling:touch;}
   .city-row{display:flex; align-items:center; gap:10px; padding:13px 12px; border-radius:12px; cursor:pointer; font-size:15px;}
-  .city-row:active{background:#0a2418;}
+  .city-row:active{background:var(--inner);}
   .city-row.sel{background:#16a34a22; border:1px solid var(--green-d);}
   .city-row .cflag{font-size:18px;}
   .city-row .ccheck{margin-inline-start:auto; color:var(--gold); font-weight:800;}
@@ -319,13 +342,13 @@
   .adhkar-btn{width:100%; margin-top:10px; padding:11px; border-radius:12px; border:1px solid var(--gold-d); background:#7c4a1e22; color:var(--gold); font-family:inherit; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;}
   .adhkar-btn:active{transform:scale(.98);}
   /* dhikr cards inside modal */
-  .dhikr{background:#0c2a1d; border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:10px; cursor:pointer; transition:.12s; -webkit-user-select:none; user-select:none;}
+  .dhikr{background:var(--inner2); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:10px; cursor:pointer; transition:.12s; -webkit-user-select:none; user-select:none;}
   .dhikr:active{transform:scale(.99);}
   .dhikr.done{border-color:var(--green-d); background:#16a34a1a;}
   .dhikr .dtext{font-size:15px; line-height:1.9; color:var(--txt);}
   .dhikr .dfoot{display:flex; align-items:center; justify-content:space-between; margin-top:10px; gap:8px;}
   .dhikr .dhint{font-size:11px; color:var(--muted);}
-  .dhikr .dcount{font-size:13px; font-weight:800; color:var(--gold); background:#0a2418; border:1px solid var(--gold-d); border-radius:99px; padding:5px 14px; min-width:70px; text-align:center; flex:none; direction:ltr; unicode-bidi:isolate;}
+  .dhikr .dcount{font-size:13px; font-weight:800; color:var(--gold); background:var(--inner); border:1px solid var(--gold-d); border-radius:99px; padding:5px 14px; min-width:70px; text-align:center; flex:none; direction:ltr; unicode-bidi:isolate;}
   .dhikr.done .dcount{color:#6ee7a0; border-color:var(--green-d);}
   .note-row{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); cursor:pointer; font-size:12.5px;}
   .note-add{color:var(--muted);}
@@ -348,7 +371,7 @@
   .insight{background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:16px;}
   .insight .ihead{font-size:14px; font-weight:800; margin-bottom:8px; display:flex; gap:8px; align-items:center;}
   .insight .iline{font-size:13.5px; color:#cfe7db; line-height:1.7; margin:6px 0;}
-  .insight .weak{background:#0a2418; border-radius:12px; padding:10px 12px; margin-top:10px;}
+  .insight .weak{background:var(--inner); border-radius:12px; padding:10px 12px; margin-top:10px;}
   .insight b{color:var(--gold);}
 
   /* heatmap */
@@ -356,7 +379,7 @@
   .heat-row{display:flex; align-items:center; gap:8px; margin:5px 0;}
   .heat-row .hn{width:70px; font-size:12px; color:var(--muted); flex:none; display:flex; align-items:center; gap:4px;}
   .heat-cells{display:flex; gap:3px;}
-  .heat-cell{width:13px; height:13px; border-radius:3px; background:#0a2418; border:1px solid #ffffff0a; flex:none;}
+  .heat-cell{width:13px; height:13px; border-radius:3px; background:var(--inner); border:1px solid #ffffff0a; flex:none;}
   .heat-legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;}
   .heat-legend span{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; color:var(--muted);}
   .heat-legend i{width:10px; height:10px; border-radius:2px; display:inline-block;}
@@ -367,13 +390,20 @@
   .tool-btn.gold{border-color:var(--gold-d); background:#7c4a1e22; color:var(--gold);}
 
   /* settings */
+  .settings-body{overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .settings-body .setting-row{margin-bottom:10px;}
+  .edit-add{border-top:1px solid var(--line); margin-top:10px; padding-top:12px;}
+  .dhikr-edit{display:flex; align-items:center; gap:8px; background:var(--inner2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px;}
+  .dhikr-edit .de-text{flex:1; font-size:13px; line-height:1.6;}
+  .dhikr-edit .de-count{font-size:12px; font-weight:800; color:var(--gold); background:var(--inner); border:1px solid var(--gold-d); border-radius:99px; padding:3px 9px; direction:ltr; unicode-bidi:isolate; flex:none;}
+  .dhikr-edit .de-del{width:30px; height:30px; border-radius:9px; border:1px solid var(--red-d); background:transparent; color:#ef8a8a; font-size:14px; cursor:pointer; flex:none;}
   .setting-row{display:flex; align-items:center; gap:12px; background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:14px;}
   .setting-info{flex:1;}
   .setting-title{font-size:15px; font-weight:800;}
   .setting-sub{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.5;}
   .switch{position:relative; display:inline-block; width:50px; height:28px; flex:none;}
   .switch input{opacity:0; width:0; height:0;}
-  .switch .slider{position:absolute; inset:0; background:#0a2418; border:1px solid var(--line); border-radius:99px; transition:.25s; cursor:pointer;}
+  .switch .slider{position:absolute; inset:0; background:var(--inner); border:1px solid var(--line); border-radius:99px; transition:.25s; cursor:pointer;}
   .switch .slider::before{content:""; position:absolute; height:20px; width:20px; right:3px; top:3px; background:var(--muted); border-radius:50%; transition:.25s;}
   .switch input:checked + .slider{background:#16a34a55; border-color:var(--green-d);}
   .switch input:checked + .slider::before{transform:translateX(-22px); background:#6ee7a0;}
@@ -413,6 +443,8 @@
       </div>
       <div class="ntime"><b id="nextTime">—</b><span>الوقت</span></div>
     </div>
+
+    <button class="tool-btn gold" id="meBtn" style="display:none;margin-top:12px"><span class="te">🌅</span> <span id="meBtnLabel">أذكار الصباح والمساء</span></button>
 
     <div class="day-nav">
       <button id="prevDay">‹</button>
@@ -503,18 +535,7 @@
     <div class="ach-grid" id="achGrid"></div>
 
     <div class="sec-title"><span class="bar"></span> الإعدادات</div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">👩 وضع النساء</div>
-        <div class="setting-sub">٣ مستويات بدل ٥: بين الأذان والإقامة · في الوقت · فاتتني</div>
-      </div>
-      <label class="switch"><input type="checkbox" id="femaleToggle"><span class="slider"></span></label>
-    </div>
-
-    <div class="sec-title"><span class="bar"></span> التذكير والإشعارات</div>
-    <button class="notif-btn" id="installBtn" style="display:none">📲 ثبّت التطبيق على جهازك</button>
-    <button class="notif-btn" id="notifBtn">🔔 فعّل تذكير الصلاة</button>
-    <div class="notif-note" id="notifNote">الإشعارات الفورية تعمل بثبات أكبر عند إضافة التطبيق للشاشة الرئيسية. للتذكير المضمون حتى والتطبيق مغلق (خاصة على iPhone)، استخدم «تذكيرات التقويم» في قسم الأدوات بالأسفل.</div>
+    <button class="tool-btn gold" id="openSettingsBtn"><span class="te">⚙️</span> الإعدادات والتخصيص</button>
 
     <div class="sec-title"><span class="bar"></span> أدوات</div>
     <button class="tool-btn gold" id="shareBtn"><span class="te">📤</span> شارك بطاقة إنجازك (صورة)</button>
@@ -542,7 +563,62 @@
   <div class="sheet">
     <div class="sheet-head"><b>📿 أذكار بعد الصلاة <span id="adhkarFor" style="color:var(--muted);font-weight:600;font-size:13px"></span></b><button id="adhkarClose" aria-label="إغلاق">✕</button></div>
     <div class="city-list" id="adhkarList"></div>
-    <button class="tool-btn" id="adhkarReset" style="margin-top:10px">🔄 تصفير العدّاد</button>
+    <button class="tool-btn" id="adhkarReset" style="margin-top:10px">🔄 تصفير الأذكار</button>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="sheet">
+    <div class="sheet-head"><b>⚙️ الإعدادات</b><button id="settingsClose" aria-label="إغلاق">✕</button></div>
+    <div class="settings-body">
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-title">🌓 الوضع الداكن</div><div class="setting-sub">التبديل بين المظهر الداكن والفاتح</div></div>
+        <label class="switch"><input type="checkbox" id="themeToggle"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-title">👩 وضع النساء</div><div class="setting-sub">٣ مستويات بدل ٥: بين الأذان والإقامة · في الوقت · فاتتني</div></div>
+        <label class="switch"><input type="checkbox" id="femaleToggle"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-title">📿 أذكار ما بعد الصلاة</div><div class="setting-sub">إظهار زر قراءة الأذكار تحت كل صلاة</div></div>
+        <label class="switch"><input type="checkbox" id="adhkarToggle"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-title">🌅 أذكار الصباح والمساء</div><div class="setting-sub">إظهار زر أذكار الصباح والمساء في صفحة اليوم</div></div>
+        <label class="switch"><input type="checkbox" id="meToggle"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><div class="setting-title">🔔 تذكير الصلاة</div><div class="setting-sub" id="notifStatus">إشعار عند دخول وقت كل صلاة</div></div>
+        <label class="switch"><input type="checkbox" id="notifSwitch"><span class="slider"></span></label>
+      </div>
+      <button class="notif-btn" id="installBtn" style="display:none;margin-top:6px">📲 ثبّت التطبيق على جهازك</button>
+      <button class="tool-btn gold" id="editAdhkarBtn" style="margin-top:10px"><span class="te">✏️</span> تخصيص أذكار الصلاة</button>
+      <div class="notif-note">لضمان وصول التذكير حتى والتطبيق مغلق (خاصة على iPhone)، استخدم «تذكيرات التقويم» في قسم الأدوات.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="editModal">
+  <div class="sheet">
+    <div class="sheet-head"><b>✏️ تخصيص الأذكار</b><button id="editClose" aria-label="إغلاق">✕</button></div>
+    <div class="city-list" id="editList"></div>
+    <div class="edit-add">
+      <input class="city-search" id="newDhikrText" type="text" placeholder="نص الذكر…" autocomplete="off">
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <input class="city-search" id="newDhikrCount" type="number" min="1" value="1" style="width:90px;text-align:center" placeholder="التكرار">
+        <button class="tool-btn gold" id="addDhikrBtn" style="margin:0;flex:1;justify-content:center">➕ إضافة ذكر</button>
+      </div>
+      <button class="tool-btn" id="restoreAdhkarBtn" style="margin-top:8px;justify-content:center">↩️ استعادة الأذكار الافتراضية</button>
+      <div class="notif-note">التعديلات تُطبّق على كل الصلوات. المعوّذات الافتراضية تتكرر ٣ مرات في الفجر والمغرب تلقائياً.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="meModal">
+  <div class="sheet">
+    <div class="sheet-head"><b><span id="meTitle">🌅 أذكار الصباح</span></b><button id="meClose" aria-label="إغلاق">✕</button></div>
+    <div class="city-list" id="meList"></div>
+    <button class="tool-btn" id="meReset" style="margin-top:10px">🔄 تصفير الأذكار</button>
   </div>
 </div>
 
@@ -621,6 +697,11 @@ function load(){
   if(typeof d.freezes!=='number') d.freezes=1;      // تجميدة مجانية في البداية
   if(typeof d.freezeMilestone!=='number') d.freezeMilestone=0;
   if(typeof d.female!=='boolean') d.female=false;   // وضع النساء (٣ مستويات)
+  if(d.theme!=='light' && d.theme!=='dark') d.theme='dark';
+  if(typeof d.adhkarEnabled!=='boolean') d.adhkarEnabled=true;   // أذكار ما بعد الصلاة
+  if(typeof d.meEnabled!=='boolean') d.meEnabled=true;           // أذكار الصباح والمساء
+  if(!Array.isArray(d.adhkarList)) d.adhkarList=null;            // null = استخدم الافتراضي
+  if(!d.adhkarProg) d.adhkarProg={};                             // حفظ تقدّم الأذكار
   return d;
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(DB)); }
@@ -984,7 +1065,7 @@ function renderPrayers(){
             <span class="bonus-label">${on?'✓ ':'➕ '}${bd.label}</span>
             <span class="bonus-pts">+5</span>
           </div>`; }).join('') : ''}
-        ${cur!=null ? `<button class="adhkar-btn" data-pname="${displayName(p,viewDate)}">📿 قراءة أذكار ما بعد الصلاة</button>` : ''}
+        ${cur!=null && DB.adhkarEnabled ? `<button class="adhkar-btn" data-pid="${p.id}" data-pname="${displayName(p,viewDate)}">📿 قراءة أذكار ما بعد الصلاة</button>` : ''}
       </div>`;
     card.innerHTML=`
       <div class="p-head">
@@ -1007,7 +1088,7 @@ function renderPrayers(){
     el.addEventListener('click',()=>toggleBonus(el.dataset.bonus, el.dataset.bid, el));
   });
   list.querySelectorAll('.adhkar-btn').forEach(el=>{
-    el.addEventListener('click',()=>openAdhkar(el.dataset.pname));
+    el.addEventListener('click',()=>openAdhkar(el.dataset.pid, el.dataset.pname));
   });
   list.querySelectorAll('.lvl').forEach(el=>{
     el.addEventListener('click',()=>setLevel(el.dataset.p, el.dataset.l, el));
@@ -1016,6 +1097,7 @@ function renderPrayers(){
   document.getElementById('dayLabel').textContent = isToday? 'اليوم' : (AR_DAYS[viewDate.getDay()]+' '+viewDate.getDate()+' '+AR_MONTHS[viewDate.getMonth()]);
   document.getElementById('nextDay').disabled = isToday;
   renderFriday();
+  updateMeBtn();
   renderTimes();
   renderNextPrayer();
   if(!_flyingDaily) updateDaily(false);
@@ -1287,7 +1369,7 @@ function renderHeatmap(){
   const el=document.getElementById('heatCard'), days=14;
   const dates=[]; const t=new Date(); for(let i=days-1;i>=0;i--){ const d=new Date(t); d.setDate(t.getDate()-i); dates.push(d); }
   const rows=PRAYERS.map(p=>{
-    const cells=dates.map(d=>{ const v=(DB.days[ymd(d)]||{})[p.id]; const bg=v!=null?lvlById(v).color:'#0a2418';
+    const cells=dates.map(d=>{ const v=(DB.days[ymd(d)]||{})[p.id]; const bg=v!=null?lvlById(v).color:'var(--inner)';
       return `<div class="heat-cell" style="background:${bg}" title="${p.name} ${d.getDate()}/${d.getMonth()+1}"></div>`; }).join('');
     return `<div class="heat-row"><div class="hn">${p.icon} ${p.name}</div><div class="heat-cells">${cells}</div></div>`;
   }).join('');
@@ -1412,15 +1494,133 @@ document.getElementById('resetBtn').addEventListener('click',()=>{
   }
 });
 
-/* ================= وضع النساء ================= */
+/* ================= الإعدادات ================= */
+function applyTheme(){
+  document.documentElement.dataset.theme = DB.theme==='light' ? 'light' : 'dark';
+  const tc=document.querySelector('meta[name="theme-color"]'); if(tc) tc.setAttribute('content', DB.theme==='light'?'#eef4f0':'#0f5132');
+}
+applyTheme();
+const settingsModal=document.getElementById('settingsModal');
 const femaleToggle=document.getElementById('femaleToggle');
 femaleToggle.checked=DB.female;
+function syncSettings(){
+  document.getElementById('themeToggle').checked = DB.theme==='dark';
+  femaleToggle.checked = DB.female;
+  document.getElementById('adhkarToggle').checked = DB.adhkarEnabled;
+  document.getElementById('meToggle').checked = DB.meEnabled;
+  updateNotifBtn();
+}
+document.getElementById('openSettingsBtn').addEventListener('click',()=>{ syncSettings(); settingsModal.classList.add('show'); });
+document.getElementById('settingsClose').addEventListener('click',()=>settingsModal.classList.remove('show'));
+settingsModal.addEventListener('click',e=>{ if(e.target===settingsModal) settingsModal.classList.remove('show'); });
+document.getElementById('themeToggle').addEventListener('change',e=>{
+  DB.theme = e.target.checked ? 'dark' : 'light'; save(); applyTheme();
+  toast(DB.theme==='dark'?'🌙 الوضع الداكن':'☀️ الوضع الفاتح');
+});
 femaleToggle.addEventListener('change',()=>{
   DB.female=femaleToggle.checked; save(); applyMode();
   renderPrayers(); renderHero();
   if(document.getElementById('page-summary').classList.contains('active')) renderSummary();
   toast(DB.female?'👩 تم تفعيل وضع النساء (٣ مستويات)':'تم الرجوع للوضع العادي (٥ مستويات)');
 });
+document.getElementById('adhkarToggle').addEventListener('change',e=>{
+  DB.adhkarEnabled=e.target.checked; save(); renderPrayers();
+  toast(DB.adhkarEnabled?'📿 أذكار ما بعد الصلاة مُفعّلة':'تم إخفاء أذكار ما بعد الصلاة');
+});
+document.getElementById('meToggle').addEventListener('change',e=>{
+  DB.meEnabled=e.target.checked; save(); updateMeBtn();
+  toast(DB.meEnabled?'🌅 أذكار الصباح والمساء مُفعّلة':'تم إخفاء أذكار الصباح والمساء');
+});
+
+/* ===== محرّر أذكار الصلاة ===== */
+const editModal=document.getElementById('editModal');
+const editList=document.getElementById('editList');
+function ensureCustomList(){ if(!DB.adhkarList || !DB.adhkarList.length) DB.adhkarList=DEFAULT_ADHKAR.map(a=>Object.assign({},a)); }
+function renderEditList(){
+  editList.innerHTML=getAdhkar().map(a=>`
+    <div class="dhikr-edit" data-id="${a.id}">
+      <div class="de-text">${esc(a.text)}${a.tri?' <span style="color:var(--muted)">(×٣ فجر/مغرب)</span>':''}</div>
+      <span class="de-count" data-cnt="${a.id}">×${a.c}</span>
+      <button class="de-del" data-del="${a.id}" aria-label="حذف">🗑</button>
+    </div>`).join('');
+  editList.querySelectorAll('.de-del').forEach(el=> el.addEventListener('click',()=>{ ensureCustomList(); DB.adhkarList=DB.adhkarList.filter(a=>a.id!==el.dataset.del); save(); renderEditList(); toast('🗑 تم حذف الذكر'); }));
+  editList.querySelectorAll('.de-count').forEach(el=> el.addEventListener('click',()=>{
+    ensureCustomList(); const a=DB.adhkarList.find(x=>x.id===el.dataset.cnt); if(!a) return;
+    const v=prompt('عدد التكرار:', a.c); if(v===null) return; a.c=Math.max(1, parseInt(v)||1); delete a.tri; save(); renderEditList();
+  }));
+}
+document.getElementById('editAdhkarBtn').addEventListener('click',()=>{ renderEditList(); settingsModal.classList.remove('show'); editModal.classList.add('show'); editList.scrollTop=0; });
+document.getElementById('editClose').addEventListener('click',()=>editModal.classList.remove('show'));
+editModal.addEventListener('click',e=>{ if(e.target===editModal) editModal.classList.remove('show'); });
+document.getElementById('addDhikrBtn').addEventListener('click',()=>{
+  const t=document.getElementById('newDhikrText').value.trim();
+  const c=Math.max(1, parseInt(document.getElementById('newDhikrCount').value)||1);
+  if(!t){ toast('اكتب نص الذكر أولاً'); return; }
+  ensureCustomList(); DB.adhkarList.push({id:'c'+Date.now(), text:t.slice(0,300), c}); save();
+  document.getElementById('newDhikrText').value=''; document.getElementById('newDhikrCount').value=1;
+  renderEditList(); toast('➕ تمت إضافة الذكر');
+});
+document.getElementById('restoreAdhkarBtn').addEventListener('click',()=>{
+  if(confirm('استعادة الأذكار الافتراضية؟ سيتم حذف تعديلاتك.')){ DB.adhkarList=null; save(); renderEditList(); toast('↩️ تمت الاستعادة'); }
+});
+
+/* ===== أذكار الصباح والمساء ===== */
+const ME_ADHKAR=[
+  {id:'kursi',   text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ… وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
+  {id:'ikhlas',  text:'قُلْ هُوَ اللَّهُ أَحَدٌ (سورة الإخلاص)', c:3},
+  {id:'falaq',   text:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (سورة الفلق)', c:3},
+  {id:'nas',     text:'قُلْ أَعُوذُ بِرَبِّ النَّاسِ (سورة الناس)', c:3},
+  {id:'sayyid',  text:'سيّد الاستغفار: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ…', c:1},
+  {id:'reda',    text:'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا', c:3},
+  {id:'afiya',   text:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ', c:1},
+  {id:'hasbi',   text:'حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ', c:7},
+  {id:'bismillah',text:'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ', c:3},
+  {id:'subhan',  text:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', c:100},
+  {id:'tahleel', text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ', c:10},
+  {id:'salawat', text:'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَىٰ نَبِيِّنَا مُحَمَّدٍ', c:10},
+];
+const meModal=document.getElementById('meModal');
+const meListEl=document.getElementById('meList');
+const meBtn=document.getElementById('meBtn');
+let meCounts={}, meCtx=null;
+function mePeriod(){ return new Date().getHours()<12 ? 'morning' : 'evening'; }
+function updateMeBtn(){
+  if(!DB.meEnabled){ meBtn.style.display='none'; return; }
+  meBtn.style.display='flex';
+  const per=mePeriod();
+  document.getElementById('meBtnLabel').textContent = per==='morning'?'أذكار الصباح':'أذكار المساء';
+  meBtn.querySelector('.te').textContent = per==='morning'?'🌅':'🌇';
+}
+function openME(){
+  const per=mePeriod(), key='me_'+ymd(new Date())+'_'+per;
+  meCtx={key}; const saved=DB.adhkarProg[key]||{};
+  meCounts={}; ME_ADHKAR.forEach(a=> meCounts[a.id]=saved[a.id]||0);
+  document.getElementById('meTitle').textContent = per==='morning'?'🌅 أذكار الصباح':'🌇 أذكار المساء';
+  renderMEList(); meModal.classList.add('show'); meListEl.scrollTop=0;
+}
+function saveME(){ if(!meCtx) return; const any=Object.values(meCounts).some(v=>v>0); if(any) DB.adhkarProg[meCtx.key]=Object.assign({},meCounts); else delete DB.adhkarProg[meCtx.key]; save(); }
+function renderMEList(){
+  meListEl.innerHTML=ME_ADHKAR.map(a=>{ const n=meCounts[a.id]||0, done=n>=a.c;
+    return `<div class="dhikr${done?' done':''}" data-id="${a.id}">
+      <div class="dtext">${esc(a.text)}</div>
+      <div class="dfoot"><span class="dhint">${a.c>1?'اضغط للعدّ':'اضغط عند الانتهاء'}</span>
+      <span class="dcount">${done?'✓ ':''}${n} / ${a.c}</span></div>
+    </div>`; }).join('');
+  meListEl.querySelectorAll('.dhikr').forEach(el=> el.addEventListener('click',()=>tapME(el.dataset.id)));
+}
+function tapME(id){
+  const a=ME_ADHKAR.find(x=>x.id===id); if(!a) return;
+  if((meCounts[id]||0)<a.c){ meCounts[id]=(meCounts[id]||0)+1; buzz(8); }
+  saveME();
+  const el=meListEl.querySelector('.dhikr[data-id="'+id+'"]'); const n=meCounts[id], done=n>=a.c;
+  el.classList.toggle('done',done); el.querySelector('.dcount').textContent=(done?'✓ ':'')+n+' / '+a.c;
+  if(ME_ADHKAR.every(x=>(meCounts[x.id]||0)>=x.c)) toast('🌟 تقبّل الله، أتممت الأذكار');
+}
+meBtn.addEventListener('click',openME);
+document.getElementById('meClose').addEventListener('click',()=>meModal.classList.remove('show'));
+document.getElementById('meReset').addEventListener('click',()=>{ meCounts={}; saveME(); renderMEList(); toast('🔄 تم تصفير الأذكار'); });
+meModal.addEventListener('click',e=>{ if(e.target===meModal) meModal.classList.remove('show'); });
+updateMeBtn();
 
 /* ================= CITY PICKER ================= */
 const cityModal=document.getElementById('cityModal');
@@ -1451,53 +1651,73 @@ cityModal.addEventListener('click',e=>{ if(e.target===cityModal) closeCityModal(
 citySearch.addEventListener('input',()=>renderCityList(citySearch.value));
 
 /* ================= أذكار ما بعد الصلاة ================= */
-const ADHKAR=[
-  {text:'أَسْتَغْفِرُ اللَّهَ', c:3},
-  {text:'اللَّهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ', c:1},
-  {text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ. اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ', c:1},
-  {text:'سُبْحَانَ اللَّهِ', c:33},
-  {text:'الْحَمْدُ لِلَّهِ', c:33},
-  {text:'اللَّهُ أَكْبَرُ', c:33},
-  {text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ (تمام المئة)', c:1},
-  {text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ، لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ… وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
-  {text:'قُلْ هُوَ اللَّهُ أَحَدٌ (سورة الإخلاص)', c:3},
-  {text:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (سورة الفلق)', c:3},
-  {text:'قُلْ أَعُوذُ بِرَبِّ النَّاسِ (سورة الناس)', c:3},
+// القائمة الافتراضية — المعوّذات (tri) تتكرر ٣ مرات للفجر والمغرب ومرّة لغيرها
+const DEFAULT_ADHKAR=[
+  {id:'istighfar', text:'أَسْتَغْفِرُ اللَّهَ', c:3},
+  {id:'salam',     text:'اللَّهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ', c:1},
+  {id:'tahleel1',  text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ. اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ', c:1},
+  {id:'tasbeeh',   text:'سُبْحَانَ اللَّهِ', c:33},
+  {id:'tahmeed',   text:'الْحَمْدُ لِلَّهِ', c:33},
+  {id:'takbeer',   text:'اللَّهُ أَكْبَرُ', c:33},
+  {id:'tahleel100',text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ (تمام المئة)', c:1},
+  {id:'kursi',     text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ، لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ… وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
+  {id:'ikhlas',    text:'قُلْ هُوَ اللَّهُ أَحَدٌ (سورة الإخلاص)', c:1, tri:true},
+  {id:'falaq',     text:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (سورة الفلق)', c:1, tri:true},
+  {id:'nas',       text:'قُلْ أَعُوذُ بِرَبِّ النَّاسِ (سورة الناس)', c:1, tri:true},
 ];
-let adhkarCounts=[];
+function getAdhkar(){ return (DB.adhkarList && DB.adhkarList.length) ? DB.adhkarList : DEFAULT_ADHKAR; }
+// العدد الفعّال: المعوّذات ٣ للفجر والمغرب، ومرّة لغيرها
+function effCount(a, pid){ if(a.tri) return (pid==='fajr'||pid==='maghrib')?3:1; return a.c; }
+
+let adhkarCounts={}, adhkarCtx=null;
 const adhkarModal=document.getElementById('adhkarModal');
-const adhkarList=document.getElementById('adhkarList');
-function openAdhkar(prayerName){
-  adhkarCounts=ADHKAR.map(()=>0);
+const adhkarListEl=document.getElementById('adhkarList');
+function openAdhkar(pid, prayerName){
+  if(!DB.adhkarEnabled) return;
+  const key=ymd(viewDate)+'_'+pid;
+  adhkarCtx={pid, key};
+  const saved=DB.adhkarProg[key]||{};
+  adhkarCounts={}; getAdhkar().forEach(a=> adhkarCounts[a.id]=saved[a.id]||0);
   document.getElementById('adhkarFor').textContent = prayerName? ('— بعد '+prayerName):'';
   renderAdhkarList();
-  adhkarModal.classList.add('show');
-  adhkarList.scrollTop=0;
+  adhkarModal.classList.add('show'); adhkarListEl.scrollTop=0;
 }
 function closeAdhkar(){ adhkarModal.classList.remove('show'); }
+function saveAdhkarProg(){
+  if(!adhkarCtx) return;
+  const any=Object.values(adhkarCounts).some(v=>v>0);
+  if(any) DB.adhkarProg[adhkarCtx.key]=Object.assign({}, adhkarCounts);
+  else delete DB.adhkarProg[adhkarCtx.key];
+  save();
+}
 function renderAdhkarList(){
-  adhkarList.innerHTML=ADHKAR.map((a,i)=>{
-    const done=adhkarCounts[i]>=a.c;
-    return `<div class="dhikr${done?' done':''}" data-i="${i}">
-      <div class="dtext">${a.text}</div>
+  const list=getAdhkar();
+  adhkarListEl.innerHTML=list.map(a=>{
+    const c=effCount(a,adhkarCtx.pid), n=adhkarCounts[a.id]||0, done=n>=c;
+    return `<div class="dhikr${done?' done':''}" data-id="${a.id}">
+      <div class="dtext">${esc(a.text)}</div>
       <div class="dfoot">
-        <span class="dhint">${a.c>1?'اضغط للعدّ':'اضغط عند الانتهاء'}</span>
-        <span class="dcount">${done?'✓ ':''}${adhkarCounts[i]} / ${a.c}</span>
+        <span class="dhint">${c>1?'اضغط للعدّ':'اضغط عند الانتهاء'}</span>
+        <span class="dcount">${done?'✓ ':''}${n} / ${c}</span>
       </div>
     </div>`;
   }).join('');
-  adhkarList.querySelectorAll('.dhikr').forEach(el=> el.addEventListener('click',()=>tapDhikr(+el.dataset.i)));
+  adhkarListEl.querySelectorAll('.dhikr').forEach(el=> el.addEventListener('click',()=>tapDhikr(el.dataset.id)));
 }
-function tapDhikr(i){
-  if(adhkarCounts[i]<ADHKAR[i].c){ adhkarCounts[i]++; buzz(8); }
-  const el=adhkarList.querySelector('.dhikr[data-i="'+i+'"]');
-  const done=adhkarCounts[i]>=ADHKAR[i].c;
+function tapDhikr(id){
+  const a=getAdhkar().find(x=>x.id===id); if(!a) return;
+  const c=effCount(a,adhkarCtx.pid);
+  if((adhkarCounts[id]||0)<c){ adhkarCounts[id]=(adhkarCounts[id]||0)+1; buzz(8); }
+  saveAdhkarProg();
+  const el=adhkarListEl.querySelector('.dhikr[data-id="'+id+'"]');
+  const n=adhkarCounts[id], done=n>=c;
   el.classList.toggle('done',done);
-  el.querySelector('.dcount').textContent=(done?'✓ ':'')+adhkarCounts[i]+' / '+ADHKAR[i].c;
-  if(adhkarCounts.every((n,idx)=>n>=ADHKAR[idx].c)) toast('📿 تقبّل الله، أتممت الأذكار');
+  el.querySelector('.dcount').textContent=(done?'✓ ':'')+n+' / '+c;
+  if(getAdhkar().every(x=> (adhkarCounts[x.id]||0)>=effCount(x,adhkarCtx.pid))) toast('📿 تقبّل الله، أتممت الأذكار');
 }
 document.getElementById('adhkarClose').addEventListener('click',closeAdhkar);
-document.getElementById('adhkarReset').addEventListener('click',()=>{ adhkarCounts=ADHKAR.map(()=>0); renderAdhkarList(); });
+// زر التصفير هو الوحيد الذي يمسح العلامات — الإغلاق لا يصفّر
+document.getElementById('adhkarReset').addEventListener('click',()=>{ adhkarCounts={}; saveAdhkarProg(); renderAdhkarList(); toast('🔄 تم تصفير الأذكار'); });
 adhkarModal.addEventListener('click',e=>{ if(e.target===adhkarModal) closeAdhkar(); });
 
 /* ================= TOOLS: export / import / calendar / share ================= */
@@ -1592,18 +1812,22 @@ function shareCard(){
 }
 
 /* ================= NOTIFICATIONS / REMINDERS ================= */
-const notifBtn=document.getElementById('notifBtn');
+const notifSwitch=document.getElementById('notifSwitch');
+const notifStatus=document.getElementById('notifStatus');
 function updateNotifBtn(){
-  if(!('Notification' in window)){ notifBtn.textContent='🔔 الإشعارات غير مدعومة بهذا المتصفح'; notifBtn.disabled=true; return; }
-  if(Notification.permission==='granted'){ notifBtn.textContent='✅ التذكير مُفعّل'; notifBtn.classList.add('on'); }
-  else if(Notification.permission==='denied'){ notifBtn.textContent='🔕 الإشعارات محظورة — فعّلها من إعدادات المتصفح'; }
-  else { notifBtn.textContent='🔔 فعّل تذكير الصلاة'; notifBtn.classList.remove('on'); }
+  if(!('Notification' in window)){ notifSwitch.disabled=true; notifStatus.textContent='الإشعارات غير مدعومة بهذا المتصفح'; return; }
+  const g=Notification.permission==='granted';
+  notifSwitch.checked=g;
+  notifStatus.textContent = g ? '✅ مُفعّل — إشعار عند دخول كل صلاة'
+    : Notification.permission==='denied' ? '🔕 محظورة — فعّلها من إعدادات المتصفح'
+    : 'إشعار عند دخول وقت كل صلاة';
 }
-notifBtn.addEventListener('click',()=>{
-  if(!('Notification' in window)){ toast('متصفحك لا يدعم الإشعارات'); return; }
+notifSwitch.addEventListener('change',()=>{
+  if(!('Notification' in window)){ toast('متصفحك لا يدعم الإشعارات'); notifSwitch.checked=false; return; }
+  if(!notifSwitch.checked){ toast('لإيقاف الإشعارات عطّلها من إعدادات المتصفح'); updateNotifBtn(); return; }
   Notification.requestPermission().then(p=>{
     updateNotifBtn();
-    if(p==='granted'){ toast('🔔 تم تفعيل التذكير'); try{ new Notification('متابعة الصلاة',{body:'سنذكّرك بعد كل صلاة لتسجّل تقدمك 🕌'}); }catch(e){} scheduleReminders(); }
+    if(p==='granted'){ toast('🔔 تم تفعيل التذكير'); try{ new Notification('متابعة الصلاة',{body:'سنذكّرك عند دخول وقت كل صلاة 🕌'}); }catch(e){} scheduleReminders(); }
     else toast('لم يتم منح الإذن');
   });
 });
