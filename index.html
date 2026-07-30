@@ -164,7 +164,8 @@
   .prayer.collapsed{padding:12px 14px;}
   .prayer.collapsed.done{opacity:.92;}
   .prayer.collapsed .p-toggle .chev{transform:rotate(180deg);}
-  .p-body{animation:fade .25s;}
+  .p-body{overflow:hidden; max-height:700px; opacity:1; transition:max-height .42s cubic-bezier(.4,0,.2,1), opacity .3s ease;}
+  .prayer.collapsed .p-body{max-height:0; opacity:0;}
   .levels{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:12px;}
   .lvl{
     border:1px solid var(--line); background:var(--inner2);
@@ -1062,6 +1063,7 @@ function checkChallenges(){
 /* ================= RENDER: TODAY ================= */
 // توسيع/طيّ الصلوات يدوياً (pid -> true/false)، يُصفّر عند تغيّر اليوم المعروض
 let uiExpand={}, uiExpandKey=null;
+let collapsedNow={}, collapseReady=false; // لتحريك الطيّ/الفتح بسلاسة
 
 function renderHero(){
   const tp=totalPoints();
@@ -1089,13 +1091,14 @@ function renderHero(){
 
 function renderPrayers(){
   const key=ymd(viewDate);
-  if(uiExpandKey!==key){ uiExpand={}; uiExpandKey=key; } // صفّر التوسيع اليدوي عند تغيّر اليوم
+  if(uiExpandKey!==key){ uiExpand={}; uiExpandKey=key; collapsedNow={}; collapseReady=false; } // صفّر عند تغيّر اليوم (بلا تحريك)
   const d=dayData(key);
   const times=prayerTimesFor(viewDate);
   const isToday = key===ymd(new Date());
   const nh=nowHours();
   const list=document.getElementById('prayerList');
   list.innerHTML='';
+  const animQueue=[];
   PRAYERS.forEach((p,idx)=>{
     const cur=d[p.id];
     const ptime=times[p.id];
@@ -1104,14 +1107,23 @@ function renderPrayers(){
     const next=PRAYERS[idx+1];
     const collapsible = cur!=null && next && d[next.id]!=null;
     const collapsed = collapsible && (uiExpand[p.id]!==undefined ? !uiExpand[p.id] : true);
+    // طيّ/فتح متحرّك وسلس بدل الفوري: نرسم حالة البداية ثم نبدّل الصنف بعد إطار
+    const wasCol = !!collapsedNow[p.id];
+    let renderCol = collapsed, anim=null;
+    if(collapseReady && collapsible){
+      if(collapsed && !wasCol){ renderCol=false; anim='collapse'; }
+      else if(!collapsed && wasCol){ renderCol=true; anim='expand'; }
+    }
+    collapsedNow[p.id]=collapsed;
+    if(anim) animQueue.push({pid:p.id, anim});
     const card=document.createElement('div');
-    card.className='prayer'+(cur!=null?' done':'')+(due?' due':'')+(collapsed?' collapsed':'');
+    card.className='prayer'+(cur!=null?' done':'')+(due?' due':'')+(renderCol?' collapsed':'');
     card.dataset.pid=p.id;
     if(cur!=null) card.style.setProperty('--pc', lvlById(cur).color);
     let statusHtml='<div class="p-status">لم تُسجّل</div>';
     if(cur!=null){ const l=lvlById(cur); statusHtml=`<div class="p-status set" style="background:${l.color}">${l.face} ${l.label}</div>`; }
     const toggleHtml = collapsible ? `<button class="p-toggle" data-toggle="${p.id}" aria-label="عرض الخيارات"><span class="chev">▾</span></button>` : '';
-    const bodyHtml = collapsed ? '' : `
+    const bodyHtml = `
       ${due?'<div class="due-flag">⏰ دخل وقتها — سجّل صلاتك</div>':''}
       <div class="p-body">
         <div class="levels" style="grid-template-columns:repeat(${LEVELS.length},1fr)">
@@ -1141,6 +1153,12 @@ function renderPrayers(){
       </div>${bodyHtml}`;
     list.appendChild(card);
   });
+  // شغّل تحريك الطيّ/الفتح بعد رسم حالة البداية (بعد فرض تخطيط لضمان الانتقال)
+  if(animQueue.length){
+    void list.offsetHeight;
+    requestAnimationFrame(()=>{ animQueue.forEach(({pid,anim})=>{ const el=list.querySelector('.prayer[data-pid="'+pid+'"]'); if(!el) return; if(anim==='collapse') el.classList.add('collapsed'); else el.classList.remove('collapsed'); }); });
+  }
+  collapseReady=true;
   // bind
   list.querySelectorAll('.p-toggle').forEach(el=>{
     el.addEventListener('click',()=>{ const pid=el.dataset.toggle; uiExpand[pid]=(uiExpand[pid]===undefined?true:!uiExpand[pid]); anchoredRender(pid); });
