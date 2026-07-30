@@ -130,7 +130,7 @@
   .friday-card{background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--gold-d); border-radius:16px; padding:12px;}
   .friday-card .bonus-row{margin-top:0; margin-bottom:8px;}
   .friday-card .bonus-row:last-child{margin-bottom:0;}
-  .fly-pts{position:fixed; z-index:300; font-weight:900; font-size:30px; color:var(--gold); text-shadow:0 2px 12px #000e, 0 0 18px #e9c46a88; pointer-events:none; will-change:transform,opacity;}
+  .fly-pts{position:fixed; z-index:300; font-weight:900; font-size:30px; color:var(--gold); text-shadow:0 2px 12px #000e, 0 0 18px #e9c46a88; pointer-events:none; will-change:transform,opacity; backface-visibility:hidden; contain:layout style paint;}
 
   .streak-chip{
     display:inline-flex; align-items:center; gap:6px;
@@ -1189,10 +1189,10 @@ function toggleFriday(tid, fromEl){
   if(Object.keys(f).length===0) delete DB.days[key].friday;
   save();
   _flyingDaily=!!rect;
-  renderPrayers(); renderHero();
   const t=FRIDAY_TASKS.find(x=>x.id===tid);
+  if(rect) flyPoints(rect, t.pts);            // ابدأ الحركة أولاً (على معالج الرسوميات)
+  requestAnimationFrame(()=>{ renderPrayers(); renderHero(); }); // ثم أعد الرسم دون تعطيل الحركة
   if(turningOn) toast('🌟 أحسنت! +'+t.pts+' — '+t.label);
-  if(rect) flyPoints(rect, t.pts);
 }
 
 // إعادة رسم الصلوات مع تثبيت موضع صلاة معيّنة بصرياً (حتى لا تقفز عند طيّ ما فوقها)
@@ -1247,9 +1247,9 @@ function toggleBonus(pid, bid, fromEl){
   if(Object.keys(b).length===0) delete DB.days[key].bonus[pid];
   save();
   _flyingDaily = !!rect;
-  anchoredRender(pid);
+  if(rect) flyPoints(rect, BONUS_DEFS[bid].pts);   // ابدأ الحركة أولاً
+  requestAnimationFrame(()=>anchoredRender(pid));  // ثم أعد الرسم
   if(turningOn) toast('🌟 أحسنت! +٥ نقاط — '+BONUS_DEFS[bid].label);
-  if(rect) flyPoints(rect, BONUS_DEFS[bid].pts);
 }
 function flyPoints(rect, amount){
   const tgt=document.querySelector('.daily-ringwrap');
@@ -1323,14 +1323,14 @@ function setLevel(pid, lid, fromEl){
   else { DB.days[key][pid]=lid; buzz(18); }
   save();
   _flyingDaily = !!rect; // امنع تحديث العدّاد فوراً حتى تصل الحركة
-  anchoredRender(pid); renderHero(); // ثبّت موضع الصلاة المسجّلة حتى لا تقفز
+  if(rect) flyPoints(rect, amount);                       // ابدأ الحركة أولاً (سلسة على معالج الرسوميات)
+  requestAnimationFrame(()=>{ anchoredRender(pid); renderHero(); }); // ثم أعد الرسم بعدها بإطار
   // feedback
   if(selecting){
     if(lid==='green') toast(DB.female?'🟢 ما شاء الله! صلّيتِ بين الأذان والإقامة':'🟢 ما شاء الله! أدركت التكبيرة الأولى');
     else if(lid==='yellow') toast(DB.female?'🟡 أحسنتِ، صلّيتِ في الوقت':'🟡 أحسنت، أدركت الركعة الأولى');
     else if(lid==='red') toast(DB.female?'🔴 لا تيأسي، الصلاة القادمة فرصة جديدة':'🔴 لا تيأس، الصلاة القادمة فرصة جديدة');
   }
-  if(rect) flyPoints(rect, amount);
   if(!wasComplete && isComplete(key)){ celebrateDay(key); }
   checkAchievements();
   checkChallenges();
