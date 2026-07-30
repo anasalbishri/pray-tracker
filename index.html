@@ -907,6 +907,13 @@ const BONUS_DEFS = {
 // المكافآت المعروضة حسب الوضع (الجماعة تخص الرجال)
 function activeBonusItems(){ return DB.female ? ['sunnah'] : ['saff','walk']; }
 function bonusFor(key,pid,bid){ const d=DB.days[key]; return !!(d && d.bonus && d.bonus[pid] && d.bonus[pid][bid]); }
+// المشي للمسجد والصف الأول لا تنطبق عند الصلاة في البيت أو فواتها؛ والسنة لا تنطبق عند الفوات
+function bonusApplies(bid, cur){
+  if((bid==='saff'||bid==='walk') && (cur==='oud'||cur==='red')) return false;
+  if(bid==='sunnah' && cur==='red') return false;
+  return true;
+}
+function bonusItemsFor(cur){ return activeBonusItems().filter(bid=>bonusApplies(bid,cur)); }
 // ===== سنن يوم الجمعة =====
 const FRIDAY_TASKS = [
   {id:'kahf',    label:'📖 قراءة سورة الكهف',         pts:5},
@@ -924,7 +931,7 @@ function dayD20(key){
   PRAYERS.forEach(p=>{ if(d[p.id]!=null){
     s+=lvlById(d[p.id]).d20;
     const b=d.bonus&&d.bonus[p.id];
-    if(b){ for(const k in b){ if(b[k]&&BONUS_DEFS[k]) s+=BONUS_DEFS[k].pts; } }
+    if(b){ for(const k in b){ if(b[k]&&BONUS_DEFS[k]&&bonusApplies(k,d[p.id])) s+=BONUS_DEFS[k].pts; } }
   }});
   if(isFridayKey(key) && d.friday){ FRIDAY_TASKS.forEach(t=>{ if(d.friday[t.id]) s+=t.pts; }); }
   return s;
@@ -1112,7 +1119,7 @@ function renderPrayers(){
         <div class="note-row" data-note="${p.id}">
           ${noteFor(key,p.id) ? '<span class="note-txt">📝 '+esc(noteFor(key,p.id))+'</span>' : '<span class="note-add">📝 أضف ملاحظة</span>'}
         </div>
-        ${cur!=null ? activeBonusItems().map(bid=>{ const on=bonusFor(key,p.id,bid); const bd=BONUS_DEFS[bid];
+        ${cur!=null ? bonusItemsFor(cur).map(bid=>{ const on=bonusFor(key,p.id,bid); const bd=BONUS_DEFS[bid];
           return `<div class="bonus-row${on?' on':''}" data-bonus="${p.id}" data-bid="${bid}">
             <span class="bonus-label">${on?'✓ ':'➕ '}${bd.label}</span>
             <span class="bonus-pts">+5</span>
