@@ -639,7 +639,8 @@
       </div>
       <button class="notif-btn" id="installBtn" style="display:none;margin-top:6px">📲 ثبّت التطبيق على جهازك</button>
       <button class="tool-btn gold" id="editAdhkarBtn" style="margin-top:10px"><span class="te">✏️</span> تخصيص أذكار الصلاة</button>
-      <button class="tool-btn gold" id="editMeBtn" style="margin-top:8px"><span class="te">✏️</span> تخصيص أذكار الصباح والمساء</button>
+      <button class="tool-btn gold" id="editMorningBtn" style="margin-top:8px"><span class="te">🌅</span> تخصيص أذكار الصباح</button>
+      <button class="tool-btn gold" id="editEveningBtn" style="margin-top:8px"><span class="te">🌇</span> تخصيص أذكار المساء</button>
       <div class="notif-note">لضمان وصول التذكير حتى والتطبيق مغلق (خاصة على iPhone)، استخدم «تذكيرات التقويم» في قسم الأدوات.</div>
     </div>
   </div>
@@ -749,7 +750,11 @@ function load(){
   if(typeof d.adhkarEnabled!=='boolean') d.adhkarEnabled=true;   // أذكار ما بعد الصلاة
   if(typeof d.meEnabled!=='boolean') d.meEnabled=true;           // أذكار الصباح والمساء
   if(!Array.isArray(d.adhkarList)) d.adhkarList=null;            // null = استخدم الافتراضي
-  if(!Array.isArray(d.meList)) d.meList=null;                    // أذكار الصباح/المساء المخصّصة
+  if(!Array.isArray(d.morningList)) d.morningList=null;          // أذكار الصباح المخصّصة
+  if(!Array.isArray(d.eveningList)) d.eveningList=null;          // أذكار المساء المخصّصة
+  // ترحيل القائمة القديمة المشتركة (إن وُجدت) لكلا القائمتين
+  if(Array.isArray(d.meList) && d.meList.length){ if(!d.morningList) d.morningList=d.meList.map(a=>Object.assign({},a)); if(!d.eveningList) d.eveningList=d.meList.map(a=>Object.assign({},a)); }
+  d.meList=null;
   if(!d.adhkarProg) d.adhkarProg={};                             // حفظ تقدّم الأذكار
   if(typeof d.tbCount!=='number') d.tbCount=0;                   // عدّاد التسبيح الحالي
   if(typeof d.tbTotal!=='number') d.tbTotal=0;                   // إجمالي التسبيح
@@ -1625,13 +1630,14 @@ document.getElementById('meToggle').addEventListener('change',e=>{
 /* ===== محرّر أذكار الصلاة ===== */
 const editModal=document.getElementById('editModal');
 const editList=document.getElementById('editList');
-let editTarget='prayer'; // 'prayer' | 'me'
+let editTarget='prayer'; // 'prayer' | 'morning' | 'evening'
 // يرجّع مصفوفة القائمة القابلة للتعديل (ينسخ الافتراضي عند أول تعديل)
 function ensureEditArr(){
-  if(editTarget==='me'){ if(!DB.meList || !DB.meList.length) DB.meList=DEFAULT_ME.map(a=>Object.assign({},a)); return DB.meList; }
+  if(editTarget==='morning'){ if(!DB.morningList || !DB.morningList.length) DB.morningList=DEFAULT_ME.map(a=>Object.assign({},a)); return DB.morningList; }
+  if(editTarget==='evening'){ if(!DB.eveningList || !DB.eveningList.length) DB.eveningList=DEFAULT_ME.map(a=>Object.assign({},a)); return DB.eveningList; }
   if(!DB.adhkarList || !DB.adhkarList.length) DB.adhkarList=DEFAULT_ADHKAR.map(a=>Object.assign({},a)); return DB.adhkarList;
 }
-function editArr(){ return editTarget==='me' ? getME() : getAdhkar(); }
+function editArr(){ return editTarget==='morning' ? getMorning() : editTarget==='evening' ? getEvening() : getAdhkar(); }
 function renderEditList(){
   const list=editArr();
   editList.innerHTML=list.map((a,i)=>`
@@ -1655,14 +1661,16 @@ function renderEditList(){
 }
 function openEditor(target){
   editTarget=target;
-  document.getElementById('editTitle').textContent = target==='me' ? '✏️ تخصيص أذكار الصباح والمساء' : '✏️ تخصيص أذكار الصلاة';
-  document.getElementById('editNote').textContent = target==='me'
-    ? 'التعديلات تُطبّق على أذكار الصباح والمساء. استخدم ▲▼ لإعادة الترتيب.'
-    : 'التعديلات تُطبّق على كل الصلوات. المعوّذات الافتراضية تتكرر ٣ مرات في الفجر والمغرب تلقائياً. استخدم ▲▼ لإعادة الترتيب.';
+  const titles={prayer:'✏️ تخصيص أذكار الصلاة', morning:'🌅 تخصيص أذكار الصباح', evening:'🌇 تخصيص أذكار المساء'};
+  document.getElementById('editTitle').textContent = titles[target] || titles.prayer;
+  document.getElementById('editNote').textContent = target==='prayer'
+    ? 'التعديلات تُطبّق على كل الصلوات. المعوّذات الافتراضية تتكرر ٣ مرات في الفجر والمغرب تلقائياً. استخدم ▲▼ لإعادة الترتيب.'
+    : 'استخدم ▲▼ لإعادة الترتيب.';
   renderEditList(); settingsModal.classList.remove('show'); editModal.classList.add('show'); editList.scrollTop=0;
 }
 document.getElementById('editAdhkarBtn').addEventListener('click',()=>openEditor('prayer'));
-document.getElementById('editMeBtn').addEventListener('click',()=>openEditor('me'));
+document.getElementById('editMorningBtn').addEventListener('click',()=>openEditor('morning'));
+document.getElementById('editEveningBtn').addEventListener('click',()=>openEditor('evening'));
 document.getElementById('editClose').addEventListener('click',()=>editModal.classList.remove('show'));
 editModal.addEventListener('click',e=>{ if(e.target===editModal) editModal.classList.remove('show'); });
 document.getElementById('addDhikrBtn').addEventListener('click',()=>{
@@ -1674,16 +1682,16 @@ document.getElementById('addDhikrBtn').addEventListener('click',()=>{
   renderEditList(); toast('➕ تمت إضافة الذكر');
 });
 document.getElementById('restoreAdhkarBtn').addEventListener('click',()=>{
-  if(confirm('استعادة الأذكار الافتراضية؟ سيتم حذف تعديلاتك.')){ if(editTarget==='me') DB.meList=null; else DB.adhkarList=null; save(); renderEditList(); toast('↩️ تمت الاستعادة'); }
+  if(confirm('استعادة الأذكار الافتراضية؟ سيتم حذف تعديلاتك.')){ if(editTarget==='morning') DB.morningList=null; else if(editTarget==='evening') DB.eveningList=null; else DB.adhkarList=null; save(); renderEditList(); toast('↩️ تمت الاستعادة'); }
 });
 
 /* ===== أذكار الصباح والمساء ===== */
 const DEFAULT_ME=[
-  {id:'kursi',   text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ… وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
+  {id:'kursi',   text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ، لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ، مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ، وَلَا يَئُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
   {id:'ikhlas',  text:'قُلْ هُوَ اللَّهُ أَحَدٌ (سورة الإخلاص)', c:3},
   {id:'falaq',   text:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (سورة الفلق)', c:3},
   {id:'nas',     text:'قُلْ أَعُوذُ بِرَبِّ النَّاسِ (سورة الناس)', c:3},
-  {id:'sayyid',  text:'سيّد الاستغفار: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ…', c:1},
+  {id:'sayyid',  text:'سيّد الاستغفار: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي، فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ', c:1},
   {id:'reda',    text:'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا', c:3},
   {id:'afiya',   text:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ', c:1},
   {id:'hasbi',   text:'حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ', c:7},
@@ -1692,7 +1700,9 @@ const DEFAULT_ME=[
   {id:'tahleel', text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ', c:10},
   {id:'salawat', text:'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَىٰ نَبِيِّنَا مُحَمَّدٍ', c:10},
 ];
-function getME(){ return (DB.meList && DB.meList.length) ? DB.meList : DEFAULT_ME; }
+function getMorning(){ return (DB.morningList && DB.morningList.length) ? DB.morningList : DEFAULT_ME; }
+function getEvening(){ return (DB.eveningList && DB.eveningList.length) ? DB.eveningList : DEFAULT_ME; }
+function meListFor(per){ return per==='morning' ? getMorning() : getEvening(); }
 const meModal=document.getElementById('meModal');
 const meListEl=document.getElementById('meList');
 const meBtn=document.getElementById('meBtn');
@@ -1707,14 +1717,14 @@ function updateMeBtn(){
 }
 function openME(){
   const per=mePeriod(), key='me_'+ymd(new Date())+'_'+per;
-  meCtx={key}; const saved=DB.adhkarProg[key]||{};
-  meCounts={}; getME().forEach(a=> meCounts[a.id]=saved[a.id]||0);
+  meCtx={key, per}; const saved=DB.adhkarProg[key]||{};
+  meCounts={}; meListFor(per).forEach(a=> meCounts[a.id]=saved[a.id]||0);
   document.getElementById('meTitle').textContent = per==='morning'?'🌅 أذكار الصباح':'🌇 أذكار المساء';
   renderMEList(); meModal.classList.add('show'); meListEl.scrollTop=0;
 }
 function saveME(){ if(!meCtx) return; const any=Object.values(meCounts).some(v=>v>0); if(any) DB.adhkarProg[meCtx.key]=Object.assign({},meCounts); else delete DB.adhkarProg[meCtx.key]; save(); }
 function renderMEList(){
-  meListEl.innerHTML=getME().map(a=>{ const n=meCounts[a.id]||0, done=n>=a.c;
+  meListEl.innerHTML=meListFor(meCtx.per).map(a=>{ const n=meCounts[a.id]||0, done=n>=a.c;
     return `<div class="dhikr${done?' done':''}" data-id="${a.id}">
       <div class="dtext">${esc(a.text)}</div>
       <div class="dfoot"><span class="dhint">${a.c>1?'اضغط للعدّ':'اضغط عند الانتهاء'}</span>
@@ -1723,12 +1733,12 @@ function renderMEList(){
   meListEl.querySelectorAll('.dhikr').forEach(el=> el.addEventListener('click',()=>tapME(el.dataset.id)));
 }
 function tapME(id){
-  const a=getME().find(x=>x.id===id); if(!a) return;
+  const a=meListFor(meCtx.per).find(x=>x.id===id); if(!a) return;
   if((meCounts[id]||0)<a.c){ meCounts[id]=(meCounts[id]||0)+1; buzz(8); }
   saveME();
   const el=meListEl.querySelector('.dhikr[data-id="'+id+'"]'); const n=meCounts[id], done=n>=a.c;
   el.classList.toggle('done',done); el.querySelector('.dcount').textContent=(done?'✓ ':'')+n+' / '+a.c;
-  if(getME().every(x=>(meCounts[x.id]||0)>=x.c)) toast('🌟 تقبّل الله، أتممت الأذكار');
+  if(meListFor(meCtx.per).every(x=>(meCounts[x.id]||0)>=x.c)) toast('🌟 تقبّل الله، أتممت الأذكار');
 }
 meBtn.addEventListener('click',openME);
 document.getElementById('meClose').addEventListener('click',()=>meModal.classList.remove('show'));
@@ -1809,7 +1819,7 @@ const DEFAULT_ADHKAR=[
   {id:'tahmeed',   text:'الْحَمْدُ لِلَّهِ', c:33},
   {id:'takbeer',   text:'اللَّهُ أَكْبَرُ', c:33},
   {id:'tahleel100',text:'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ (تمام المئة)', c:1},
-  {id:'kursi',     text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ، لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ… وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
+  {id:'kursi',     text:'آيَةُ الْكُرْسِيِّ: اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ، لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ، مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ، وَلَا يَئُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ', c:1},
   {id:'ikhlas',    text:'قُلْ هُوَ اللَّهُ أَحَدٌ (سورة الإخلاص)', c:1, tri:true},
   {id:'falaq',     text:'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (سورة الفلق)', c:1, tri:true},
   {id:'nas',       text:'قُلْ أَعُوذُ بِرَبِّ النَّاسِ (سورة الناس)', c:1, tri:true},
