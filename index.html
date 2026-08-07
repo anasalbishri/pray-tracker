@@ -225,6 +225,19 @@
   .brow .bfill{height:100%; border-radius:99px; transition:width .5s;}
   .brow .bval{font-size:12px; color:var(--muted); width:34px; text-align:left; flex:none;}
 
+  /* تحدي تكبيرة الإحرام */
+  .takbeer-card{background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--gold-d); border-radius:18px; padding:16px; margin-bottom:16px;}
+  .takbeer-card.done{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold-d) inset, 0 12px 30px -14px #e9c46a66; animation:strongPulse 2.4s ease-in-out infinite;}
+  .tk-head{font-size:15px; font-weight:800; color:var(--gold);}
+  .tk-desc{font-size:12px; color:var(--muted); margin-top:8px; line-height:1.9;}
+  .tk-count{display:flex; align-items:baseline; gap:6px; margin-top:12px;}
+  .tk-count b{font-size:36px; color:#fff; line-height:1;}
+  .tk-count span{font-size:13px; color:var(--muted);}
+  .tk-track{height:10px; background:var(--inner); border-radius:99px; overflow:hidden; margin-top:10px; border:1px solid #0006;}
+  .tk-fill{height:100%; background:linear-gradient(90deg,var(--gold-d),var(--gold)); border-radius:99px; transition:width .5s;}
+  .tk-start{width:100%; margin-top:14px; padding:13px; border-radius:14px; border:1px solid var(--gold-d); background:#7c4a1e22; color:var(--gold); font-family:inherit; font-weight:800; font-size:14px; cursor:pointer;}
+  .tk-start:active{transform:scale(.98);}
+  .tk-reset{margin-top:12px; padding:8px 16px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--muted); font-family:inherit; font-weight:700; font-size:12px; cursor:pointer;}
   .range-tabs{display:flex; gap:8px; background:var(--inner); padding:5px; border-radius:14px; margin-bottom:14px;}
   .range-tabs button{
     flex:1; border:0; background:transparent; color:var(--muted);
@@ -517,6 +530,9 @@
       </div>
     </div>
 
+    <div class="sec-title"><span class="bar"></span> 🕋 تحدي تكبيرة الإحرام</div>
+    <div id="takbeerCard"></div>
+
     <div class="sec-title"><span class="bar"></span> 🎯 تحديات الأسبوع</div>
     <div class="ch-week" id="chWeek"></div>
     <div id="challengesCard"></div>
@@ -743,6 +759,7 @@ function load(){
   if(!d.notes) d.notes={};
   if(!d.frozenDays) d.frozenDays={};
   if(!d.chDone) d.chDone={};
+  if(!d.takbeer) d.takbeer={active:false, start:null};   // تحدي تكبيرة الإحرام ٤٠ يوم
   if(!d.city) d.city='jeddah';
   if(typeof d.freezes!=='number') d.freezes=1;      // تجميدة مجانية في البداية
   if(typeof d.freezeMilestone!=='number') d.freezeMilestone=0;
@@ -947,6 +964,43 @@ function isCleanDay(key){ // كل الصلوات مسجلة ولا يوجد فا
   return PRAYERS.every(p=> d[p.id]!=null && d[p.id]!=='red');
 }
 function isComplete(key){ const d=dayData(key); return PRAYERS.every(p=> d[p.id]!=null); }
+// ===== تحدي تكبيرة الإحرام (٤٠ يوماً) =====
+function isAllGreen(key){ const dd=dayData(key); return PRAYERS.every(p=> dd[p.id]==='green'); } // كل الصلوات قبل الإقامة
+function takbeerProgress(){
+  const t=DB.takbeer;
+  if(!t || !t.active || !t.start) return 0;
+  let s=0, d=new Date();
+  if(!isComplete(ymd(d))) d.setDate(d.getDate()-1); // اليوم غير مكتمل → ابدأ من أمس
+  while(ymd(d) >= t.start){
+    if(isAllGreen(ymd(d))){ s++; d.setDate(d.getDate()-1); }
+    else break; // فاتته تكبيرة → تنقطع السلسلة
+  }
+  return s;
+}
+function renderTakbeer(){
+  const el=document.getElementById('takbeerCard'); if(!el) return;
+  const t=DB.takbeer||{active:false};
+  if(!t.active){
+    el.innerHTML=`<div class="takbeer-card">
+      <div class="tk-head">🕋 المحافظة على تكبيرة الإحرام — ٤٠ يوماً</div>
+      <div class="tk-desc">أدرك تكبيرة الإحرام (كل صلواتك «قبل الإقامة») ٤٠ يوماً متتالية. «مَن صلّى لله أربعين يوماً يُدرك التكبيرة الأولى؛ كُتبت له بَراءتان: بَراءة من النار، وبَراءة من النفاق».</div>
+      <button class="tk-start" id="takbeerStart">🚀 ابدأ التحدي</button>
+    </div>`;
+  } else {
+    const p=takbeerProgress(), done=p>=40, pct=Math.min(100, p/40*100);
+    el.innerHTML=`<div class="takbeer-card${done?' done':''}">
+      <div class="tk-head">🕋 تكبيرة الإحرام — ${done?'مبارك! أتممت ٤٠ يوماً 🎉':'٤٠ يوماً'}</div>
+      <div class="tk-count"><b>${p}</b><span>/ ٤٠ يوم</span></div>
+      <div class="tk-track"><div class="tk-fill" style="width:${pct}%"></div></div>
+      <div class="tk-desc">${done?'نسأل الله أن يكتب لك البراءتين: من النار ومن النفاق. ثبّتك الله وأدام عليك.':'أدرك «قبل الإقامة» في كل صلواتك كل يوم. إن فاتتك تكبيرة (صلاة ليست «قبل الإقامة») يعود العدّاد من الصفر.'}</div>
+      <button class="tk-reset" id="takbeerStop">↩️ إيقاف / إعادة البدء</button>
+    </div>`;
+  }
+  const sb=document.getElementById('takbeerStart');
+  if(sb) sb.addEventListener('click',()=>{ DB.takbeer={active:true, start:ymd(new Date())}; save(); renderTakbeer(); toast('🕋 بدأ التحدي — وفّقك الله'); });
+  const stop=document.getElementById('takbeerStop');
+  if(stop) stop.addEventListener('click',()=>{ if(confirm('إيقاف التحدي؟ يمكنك البدء من جديد في أي وقت.')){ DB.takbeer={active:false, start:null}; save(); renderTakbeer(); } });
+}
 
 // يوم مثالي = كل الصلوات قبل الإقامة (الأساس ١٠٠/١٠٠ بدون احتساب المكافآت)
 function isPerfectDay(key){
@@ -1370,6 +1424,7 @@ function celebrateDay(key){
 let curRange='today';
 function renderSummary(){
   renderHero(); // بطاقة الرتبة صارت أعلى صفحة الملخص
+  renderTakbeer();
   renderChallenges();
   const keys=rangeKeys(curRange);
   let score=0, cap=0, logged=0, first=0, missed=0;
