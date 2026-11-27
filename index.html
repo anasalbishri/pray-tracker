@@ -499,8 +499,6 @@
     <div class="sec-title"><span class="bar"></span> صلوات اليوم</div>
     <div id="prayerList"></div>
 
-    <div id="fridayWrap"></div>
-
     <div class="sec-title" style="justify-content:space-between">
       <span style="display:flex;align-items:center;gap:8px"><span class="bar"></span> أوقات الصلاة — <span id="cityName">جدة</span></span>
       <button id="cityBtn" class="city-chip">📍 تغيير المدينة</button>
@@ -576,27 +574,8 @@
     <div class="hist" id="histList"></div>
   </div>
 
-  <!-- ===================== TASBEEH ===================== -->
-  <div class="page" id="page-tasbeeh">
-    <div class="sec-title"><span class="bar"></span> 📿 عدّاد التسبيح</div>
-    <div class="tasbeeh-card">
-      <div class="tb-dhikr" id="tbDhikr">سُبْحَانَ اللَّهِ</div>
-      <div class="tb-virtue" id="tbVirtue"></div>
-      <button class="tb-counter" id="tbCounter"><b id="tbCount">0</b><span>اضغط للتسبيح</span></button>
-      <div class="tb-controls">
-        <button class="tb-reset" id="tbReset">🔄 تصفير</button>
-        <div class="tb-total">الإجمالي: <b id="tbTotal">0</b></div>
-      </div>
-    </div>
-    <div class="sec-title"><span class="bar"></span> اختر ذكراً وفضله</div>
-    <div id="tbList"></div>
-  </div>
-
-  <!-- ===================== GARDEN ===================== -->
+  <!-- ===================== SETTINGS ===================== -->
   <div class="page" id="page-ach">
-    <div class="sec-title"><span class="bar"></span> 🌳 حديقة الصلاة</div>
-    <div id="gardenCard"></div>
-
     <div class="sec-title"><span class="bar"></span> الإعدادات</div>
     <button class="tool-btn gold" id="openSettingsBtn"><span class="te">⚙️</span> الإعدادات والتخصيص</button>
 
@@ -690,8 +669,7 @@
 <nav>
   <button data-page="today" class="on"><span class="ni">🕌</span>اليوم</button>
   <button data-page="summary"><span class="ni">📊</span>الملخص</button>
-  <button data-page="tasbeeh"><span class="ni">📿</span>التسبيح</button>
-  <button data-page="ach"><span class="ni">🌳</span>الحديقة</button>
+  <button data-page="ach"><span class="ni">⚙️</span>الإعدادات</button>
 </nav>
 
 <script>
@@ -1232,7 +1210,6 @@ function renderPrayers(){
   // day label
   document.getElementById('dayLabel').textContent = isToday? 'اليوم' : (AR_DAYS[viewDate.getDay()]+' '+viewDate.getDate()+' '+AR_MONTHS[viewDate.getMonth()]);
   document.getElementById('nextDay').disabled = isToday;
-  renderFriday();
   updateMeBtn();
   renderTimes();
   renderNextPrayer();
@@ -1587,7 +1564,6 @@ function checkAchievements(){
   let newly=[];
   ACHIEVEMENTS.forEach(a=>{ if(res[a.id] && !DB.ach[a.id]){ DB.ach[a.id]=true; newly.push(a); } });
   if(newly.length){ save(); newly.forEach(a=> toast('🏆 إنجاز جديد: '+a.n)); }
-  renderGarden();
 }
 /* ================= حديقة الصلاة ================= */
 function renderGarden(){
@@ -1639,12 +1615,11 @@ function toast(msg){
   clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600);
 }
 function switchPage(name){
+  const target=document.getElementById('page-'+name); if(!target) return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
+  target.classList.add('active');
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.page===name));
   if(name==='summary') renderSummary();
-  if(name==='ach') renderGarden();
-  if(name==='tasbeeh') renderTasbeeh();
   window.scrollTo(0,0);
 }
 document.querySelectorAll('nav button').forEach(b=> b.addEventListener('click',()=>switchPage(b.dataset.page)));
@@ -1658,7 +1633,7 @@ document.getElementById('nextDay').addEventListener('click',()=>{ if(ymd(viewDat
 document.getElementById('resetBtn').addEventListener('click',()=>{
   if(confirm('هل تريد حذف كل بياناتك والبدء من جديد؟ لا يمكن التراجع.')){
     DB={days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:CITY.id,female:DB.female}; save(); viewDate=new Date();
-    renderPrayers(); renderHero(); renderGarden(); toast('تم حذف البيانات');
+    renderPrayers(); renderHero(); toast('تم حذف البيانات');
   }
 });
 
@@ -1819,41 +1794,6 @@ document.getElementById('meReset').addEventListener('click',()=>{ meCounts={}; s
 meModal.addEventListener('click',e=>{ if(e.target===meModal) meModal.classList.remove('show'); });
 updateMeBtn();
 
-/* ================= عدّاد التسبيح ================= */
-const TASBEEH=[
-  {t:'سُبْحَانَ اللَّهِ', v:'من سبّح الله مئة مرة كُتبت له ألف حسنة أو حُطّت عنه ألف خطيئة'},
-  {t:'الْحَمْدُ لِلَّهِ', v:'تملأ الميزان'},
-  {t:'اللَّهُ أَكْبَرُ', v:'من أحبّ الكلام إلى الله'},
-  {t:'لَا إِلَٰهَ إِلَّا اللَّهُ', v:'أفضل الذكر'},
-  {t:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', v:'من قالها مئة مرة حُطّت خطاياه ولو كانت مثل زبد البحر'},
-  {t:'سُبْحَانَ اللَّهِ الْعَظِيمِ وَبِحَمْدِهِ', v:'كلمتان خفيفتان على اللسان ثقيلتان في الميزان، حبيبتان إلى الرحمن'},
-  {t:'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', v:'كنز من كنوز الجنة'},
-  {t:'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ', v:'من لزم الاستغفار جعل الله له من كل همٍّ فرجاً ومن كل ضيقٍ مخرجاً'},
-  {t:'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', v:'من صلّى عليّ صلاةً صلّى الله عليه بها عشراً'},
-];
-function renderTasbeeh(){
-  const sel=Math.min(DB.tbSel||0, TASBEEH.length-1); DB.tbSel=sel;
-  document.getElementById('tbDhikr').textContent=TASBEEH[sel].t;
-  document.getElementById('tbVirtue').textContent='✨ '+TASBEEH[sel].v;
-  document.getElementById('tbCount').textContent=DB.tbCount;
-  document.getElementById('tbTotal').textContent=(DB.tbTotal||0).toLocaleString('ar-EG');
-  const list=document.getElementById('tbList');
-  list.innerHTML=TASBEEH.map((x,i)=>`
-    <div class="tb-item${i===sel?' sel':''}" data-i="${i}">
-      <div class="tbi-dhikr">${x.t}</div>
-      <div class="tbi-virtue">✨ ${x.v}</div>
-    </div>`).join('');
-  list.querySelectorAll('.tb-item').forEach(el=> el.addEventListener('click',()=>{ DB.tbSel=+el.dataset.i; DB.tbCount=0; save(); renderTasbeeh(); toast('📿 اختر وابدأ التسبيح'); }));
-}
-document.getElementById('tbCounter').addEventListener('click',()=>{
-  DB.tbCount++; DB.tbTotal=(DB.tbTotal||0)+1; buzz(8);
-  document.getElementById('tbCount').textContent=DB.tbCount;
-  document.getElementById('tbTotal').textContent=DB.tbTotal.toLocaleString('ar-EG');
-  if(DB.tbCount===33||DB.tbCount===100){ buzz([25,40,25]); toast('📿 '+DB.tbCount+' — تقبّل الله'); }
-  save();
-});
-document.getElementById('tbReset').addEventListener('click',()=>{ DB.tbCount=0; save(); document.getElementById('tbCount').textContent='0'; toast('🔄 تم تصفير العدّاد'); });
-
 /* ================= CITY PICKER ================= */
 const cityModal=document.getElementById('cityModal');
 const cityList=document.getElementById('cityList');
@@ -1979,7 +1919,7 @@ document.getElementById('importFile').addEventListener('change',e=>{
       if(!confirm('سيتم استبدال بياناتك الحالية ببيانات الملف. متابعة؟')) return;
       DB=Object.assign({days:{},ach:{},notes:{},frozenDays:{},freezes:1,freezeMilestone:0,city:'jeddah'}, obj);
       save(); viewDate=new Date(); setCity(DB.city); updateCityName();
-      renderPrayers(); renderHero(); renderGarden(); toast('📥 تم استيراد البيانات بنجاح');
+      renderPrayers(); renderHero(); toast('📥 تم استيراد البيانات بنجاح');
     }catch(err){ toast('تعذّر قراءة الملف — تأكد أنه نسخة صحيحة'); }
   };
   r.readAsText(f);
@@ -2134,7 +2074,7 @@ async function scheduleReminders(){
 document.getElementById('hijriDate').textContent=hijri(new Date());
 updateCityName();
 updateNotifBtn();
-renderHero(); renderPrayers(); renderGarden();
+renderHero(); renderPrayers();
 reminderCheck();
 scheduleReminders();
 setInterval(()=>{ reminderCheck(); if(document.getElementById('page-today').classList.contains('active')){ renderNextPrayer(); } }, 30000);
