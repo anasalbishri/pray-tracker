@@ -38,8 +38,7 @@
   }
   :root[data-theme="light"] .hero,
   :root[data-theme="light"] .daily-card,
-  :root[data-theme="light"] .feedback,
-  :root[data-theme="light"] .friday-card{ background:linear-gradient(145deg,#dcefe3,#cbe4d4) !important; }
+  :root[data-theme="light"] .feedback{ background:linear-gradient(145deg,#dcefe3,#cbe4d4) !important; }
   :root[data-theme="light"] .daily-card.strong{ background:linear-gradient(145deg,#f4e2b0,#ecd490) !important; }
   :root[data-theme="light"] .rank-pts b,
   :root[data-theme="light"] .daily-center b,
@@ -127,9 +126,6 @@
   .bonus-row.on{border-style:solid; border-color:var(--green-d); background:#16a34a1a; color:#6ee7a0;}
   .bonus-pts{font-weight:900; background:var(--inner); border:1px solid var(--gold-d); border-radius:99px; padding:3px 11px; direction:ltr; unicode-bidi:isolate;}
   .bonus-row.on .bonus-pts{color:#6ee7a0; border-color:var(--green-d);}
-  .friday-card{background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--gold-d); border-radius:16px; padding:12px;}
-  .friday-card .bonus-row{margin-top:0; margin-bottom:8px;}
-  .friday-card .bonus-row:last-child{margin-bottom:0;}
   .fly-pts{position:fixed; z-index:300; font-weight:900; font-size:30px; color:var(--gold); text-shadow:0 2px 12px #000e, 0 0 18px #e9c46a88; pointer-events:none; will-change:transform,opacity; backface-visibility:hidden; contain:layout style paint;}
 
   .streak-chip{
@@ -416,31 +412,6 @@
   .dhikr-edit .de-mv{width:26px; height:18px; border-radius:6px; border:1px solid var(--line); background:var(--inner); color:var(--gold); font-size:9px; cursor:pointer; line-height:1; padding:0;}
   .dhikr-edit .de-mv:disabled{opacity:.3;}
 
-  /* tasbeeh page */
-  .tasbeeh-card{background:linear-gradient(145deg,#14503a,#0c3223); border:1px solid var(--line); border-radius:22px; padding:18px; text-align:center;}
-  .tb-dhikr{font-size:22px; font-weight:800; color:var(--gold); line-height:1.7;}
-  .tb-virtue{font-size:12.5px; color:var(--muted); margin-top:6px; line-height:1.7; min-height:18px;}
-  .tb-counter{margin:16px auto 0; width:180px; height:180px; border-radius:50%; border:3px solid var(--gold-d); background:var(--inner); color:var(--txt); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; transition:transform .08s; box-shadow:0 10px 30px -14px #000a, inset 0 2px 0 #ffffff10;}
-  .tb-counter:active{transform:scale(.95);}
-  .tb-counter b{font-size:52px; line-height:1; color:var(--gold);}
-  .tb-counter span{font-size:12px; color:var(--muted);}
-  .tb-controls{display:flex; align-items:center; justify-content:space-between; margin-top:16px;}
-  .tb-reset{border:1px solid var(--line); background:var(--card-solid); color:var(--txt); font-family:inherit; font-weight:700; font-size:13px; padding:9px 16px; border-radius:12px; cursor:pointer;}
-  .tb-total{font-size:13px; color:var(--muted);} .tb-total b{color:var(--gold);}
-  .tb-item{background:var(--card-solid); border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-bottom:8px; cursor:pointer; transition:.15s;}
-  .tb-item.sel{border-color:var(--gold-d); background:#7c4a1e18;}
-  .tb-item .tbi-dhikr{font-size:15px; font-weight:800; color:var(--txt);}
-  .tb-item .tbi-virtue{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.6;}
-
-  /* garden page */
-  .garden-card{background:linear-gradient(180deg,#0e3a2a,#0c3223); border:1px solid var(--line); border-radius:22px; padding:16px; overflow:hidden;}
-  .garden-card svg{width:100%; height:auto; display:block; border-radius:14px;}
-  .garden-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
-  .garden-stat{background:var(--card-solid); border:1px solid var(--line); border-radius:14px; padding:12px; text-align:center;}
-  .garden-stat b{font-size:22px; display:block; color:var(--gold);}
-  .garden-stat span{font-size:11px; color:var(--muted); margin-top:4px; display:block;}
-  .garden-msg{text-align:center; font-size:14px; font-weight:800; margin-top:14px; color:#6ee7a0;}
-  .garden-stage{text-align:center; font-size:12px; color:var(--muted); margin-top:4px;}
   .setting-row{display:flex; align-items:center; gap:12px; background:var(--card-solid); border:1px solid var(--line); border-radius:16px; padding:14px;}
   .setting-info{flex:1;}
   .setting-title{font-size:15px; font-weight:800;}
@@ -752,9 +723,6 @@ function load(){
   if(Array.isArray(d.meList) && d.meList.length){ if(!d.morningList) d.morningList=d.meList.map(a=>Object.assign({},a)); if(!d.eveningList) d.eveningList=d.meList.map(a=>Object.assign({},a)); }
   d.meList=null;
   if(!d.adhkarProg) d.adhkarProg={};                             // حفظ تقدّم الأذكار
-  if(typeof d.tbCount!=='number') d.tbCount=0;                   // عدّاد التسبيح الحالي
-  if(typeof d.tbTotal!=='number') d.tbTotal=0;                   // إجمالي التسبيح
-  if(typeof d.tbSel!=='number') d.tbSel=0;                       // الذكر المختار
   return d;
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(DB)); }
@@ -915,16 +883,6 @@ function bonusApplies(bid, cur){
   return true;
 }
 function bonusItemsFor(cur){ return activeBonusItems().filter(bid=>bonusApplies(bid,cur)); }
-// ===== سنن يوم الجمعة =====
-const FRIDAY_TASKS = [
-  {id:'kahf',    label:'📖 قراءة سورة الكهف',         pts:5},
-  {id:'salawat', label:'🤲 الصلاة على النبي ١٠٠ مرة',  pts:5},
-  {id:'walkjum', label:'🚶 المشي للمسجد',             pts:5},
-  {id:'ghusl',   label:'🚿 الاغتسال',                 pts:2},
-  {id:'nails',   label:'✂️ قص الأظافر',               pts:2},
-  {id:'perfume', label:'🌸 التطيب',                   pts:2},
-];
-function isFridayKey(key){ const p=key.split('-'); return new Date(+p[0],+p[1]-1,+p[2]).getDay()===5; }
 // اسم الصلاة: الظهر يصبح "صلاة الجمعة" يوم الجمعة
 function displayName(p, date){ return (p.id==='dhuhr' && date.getDay()===5) ? 'صلاة الجمعة' : p.name; }
 function dayD20(key){
@@ -934,7 +892,6 @@ function dayD20(key){
     const b=d.bonus&&d.bonus[p.id];
     if(b){ for(const k in b){ if(b[k]&&BONUS_DEFS[k]&&bonusApplies(k,d[p.id])) s+=BONUS_DEFS[k].pts; } }
   }});
-  if(isFridayKey(key) && d.friday){ FRIDAY_TASKS.forEach(t=>{ if(d.friday[t.id]) s+=t.pts; }); }
   return s;
 }
 function isCleanDay(key){ // كل الصلوات مسجلة ولا يوجد فائتة
@@ -1214,39 +1171,6 @@ function renderPrayers(){
   renderTimes();
   renderNextPrayer();
   if(!_flyingDaily) updateDaily(false);
-}
-
-/* ================= سنن يوم الجمعة ================= */
-function renderFriday(){
-  const wrap=document.getElementById('fridayWrap'); if(!wrap) return;
-  if(viewDate.getDay()!==5){ wrap.innerHTML=''; return; }
-  const key=ymd(viewDate);
-  const fd=(DB.days[key]&&DB.days[key].friday)||{};
-  const done=FRIDAY_TASKS.filter(t=>fd[t.id]).length, total=FRIDAY_TASKS.length;
-  const rows=FRIDAY_TASKS.map(t=>{ const on=!!fd[t.id];
-    return `<div class="bonus-row${on?' on':''}" data-fri="${t.id}">
-      <span class="bonus-label">${on?'✓ ':'➕ '}${t.label}</span>
-      <span class="bonus-pts">+${t.pts}</span>
-    </div>`; }).join('');
-  wrap.innerHTML=`<div class="sec-title"><span class="bar"></span> 🕌 سنن يوم الجمعة <span style="color:var(--muted);font-weight:600;font-size:12px">(${done}/${total})</span></div>
-    <div class="friday-card">${rows}</div>`;
-  wrap.querySelectorAll('.bonus-row').forEach(el=> el.addEventListener('click',()=>toggleFriday(el.dataset.fri, el)));
-}
-function toggleFriday(tid, fromEl){
-  const key=ymd(viewDate);
-  if(!DB.days[key]) DB.days[key]={};
-  if(!DB.days[key].friday) DB.days[key].friday={};
-  const f=DB.days[key].friday;
-  const turningOn=!f[tid];
-  const rect=(turningOn&&fromEl)?fromEl.getBoundingClientRect():null;
-  if(turningOn) f[tid]=true; else delete f[tid];
-  if(Object.keys(f).length===0) delete DB.days[key].friday;
-  save();
-  _flyingDaily=!!rect;
-  const t=FRIDAY_TASKS.find(x=>x.id===tid);
-  if(rect) flyPoints(rect, t.pts);            // ابدأ الحركة أولاً (على معالج الرسوميات)
-  requestAnimationFrame(()=>{ renderPrayers(); renderHero(); }); // ثم أعد الرسم دون تعطيل الحركة
-  if(turningOn) toast('🌟 أحسنت! +'+t.pts+' — '+t.label);
 }
 
 // إعادة رسم الصلوات مع تثبيت موضع صلاة معيّنة بصرياً (حتى لا تقفز عند طيّ ما فوقها)
@@ -1565,46 +1489,6 @@ function checkAchievements(){
   ACHIEVEMENTS.forEach(a=>{ if(res[a.id] && !DB.ach[a.id]){ DB.ach[a.id]=true; newly.push(a); } });
   if(newly.length){ save(); newly.forEach(a=> toast('🏆 إنجاز جديد: '+a.n)); }
 }
-/* ================= حديقة الصلاة ================= */
-function renderGarden(){
-  const el=document.getElementById('gardenCard'); if(!el) return;
-  const perfect=totalPoints(), streak=currentStreak();
-  let totalLogged=0; Object.keys(DB.days).forEach(k=>{ const dd=DB.days[k]; PRAYERS.forEach(p=>{ if(dd[p.id]!=null) totalLogged++; }); });
-  const stages=[{min:0,name:'بذرة'},{min:1,name:'برعم'},{min:3,name:'شتلة'},{min:7,name:'شجرة صغيرة'},{min:15,name:'شجرة يانعة'},{min:30,name:'حديقة مزهرة'}];
-  let si=0; stages.forEach((s,i)=>{ if(perfect>=s.min) si=i; });
-  const W=340,H=200, gy=160, cx=W/2;
-  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
-  svg+=`<defs><linearGradient id="gsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#123f2d"/><stop offset="1" stop-color="#0c3223"/></linearGradient></defs>`;
-  svg+=`<rect width="${W}" height="${H}" fill="url(#gsky)"/>`;
-  svg+=`<circle cx="${W-44}" cy="40" r="18" fill="#e9c46a" opacity="0.9"/>`;
-  svg+=`<path d="M0 ${gy} Q ${cx} ${gy-14} ${W} ${gy} L ${W} ${H} L 0 ${H} Z" fill="#2b6b3f"/>`;
-  svg+=`<path d="M0 ${gy+12} Q ${cx} ${gy-2} ${W} ${gy+12} L ${W} ${H} L 0 ${H} Z" fill="#1f5230"/>`;
-  if(si===0){
-    svg+=`<ellipse cx="${cx}" cy="${gy}" rx="16" ry="6" fill="#3a2a12"/><circle cx="${cx}" cy="${gy-4}" r="4.5" fill="#e9c46a"/>`;
-  }else{
-    const scale=[0,0.35,0.55,0.78,0.98,1.18][si], trunkH=52*scale, trunkW=8*scale+3, canopyR=34*scale, topY=gy-trunkH;
-    svg+=`<rect x="${cx-trunkW/2}" y="${topY}" width="${trunkW}" height="${trunkH}" rx="3" fill="#7c4a1e"/>`;
-    svg+=`<circle cx="${cx}" cy="${topY-canopyR*0.5}" r="${canopyR}" fill="#2e8b57"/>`;
-    svg+=`<circle cx="${cx-canopyR*0.7}" cy="${topY-canopyR*0.15}" r="${canopyR*0.72}" fill="#3aa06a"/>`;
-    svg+=`<circle cx="${cx+canopyR*0.7}" cy="${topY-canopyR*0.15}" r="${canopyR*0.72}" fill="#278a54"/>`;
-    if(si>=4){ for(let i=0;i<6;i++){ const ang=(i/6)*6.283; svg+=`<circle cx="${(cx+Math.cos(ang)*canopyR*0.7).toFixed(1)}" cy="${(topY-canopyR*0.4+Math.sin(ang)*canopyR*0.55).toFixed(1)}" r="3.5" fill="${si>=5?'#ff9ec4':'#e9c46a'}"/>`; } }
-  }
-  const nFlowers=Math.min(perfect,10), spots=[28,58,92,120,150,190,215,245,278,308];
-  for(let i=0;i<nFlowers;i++){ const x=spots[i], y=gy+9+((i%2)*6), col=['#e9c46a','#ff9ec4','#f4a261','#e76f9e','#ffd166'][i%5];
-    svg+=`<g transform="translate(${x},${y})"><rect x="-0.8" y="2" width="1.6" height="8" fill="#2e8b57"/><circle r="4" fill="${col}"/><circle r="1.6" fill="#fff"/></g>`; }
-  for(let i=0;i<8;i++){ const x=15+i*42; svg+=`<path d="M${x} ${gy+13} q 2 -8 4 0 M${x+3} ${gy+13} q 2 -10 4 0" stroke="#3aa06a" stroke-width="1.4" fill="none"/>`; }
-  svg+=`</svg>`;
-  const msgs=['ازرع أول يوم مثالي لتنمو حديقتك 🌱','بدأت حديقتك تنبت، واصل!','حديقتك تكبر يوماً بعد يوم 🌿','ما شاء الله، شجرتك تنمو 🌳','حديقتك يانعة، ثبّتك الله 🌟','حديقة مزهرة! أصبحت قدوة 🌸'];
-  el.innerHTML=`<div class="garden-card">${svg}</div>
-    <div class="garden-stage">المرحلة: ${stages[si].name}${si<5?` — التالي بعد ${stages[si+1].min-perfect} يوم مثالي`:''}</div>
-    <div class="garden-msg">${msgs[si]}</div>
-    <div class="garden-stats">
-      <div class="garden-stat"><b>${perfect}</b><span>يوم مثالي 🌟</span></div>
-      <div class="garden-stat"><b>${streak}</b><span>سلسلة 🔥</span></div>
-      <div class="garden-stat"><b>${totalLogged}</b><span>صلاة مسجّلة</span></div>
-    </div>`;
-}
-
 /* ================= UI PLUMBING ================= */
 // اهتزاز لطيف عند التفاعل (يعمل على أندرويد؛ متصفح iOS لا يدعم الاهتزاز)
 function buzz(pattern){ try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){} }
